@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import styles from "../styles/create.module.css";
-import { Input, Icon, TextArea, Button, Divider } from "semantic-ui-react";
+import styles from "../styles/write.module.css";
+import { Input, Icon, TextArea, Button, Divider, Message } from "semantic-ui-react";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 import axios from "axios";
 
 export default function write({ userInfo }) {
   const [fileUrl, updateFileUrl] = useState(``);
-
+  const [isWantImage, setIsWantImage] = useState(false);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [isMint, setIsMint] = useState(false);
@@ -91,42 +91,15 @@ export default function write({ userInfo }) {
       <div className={styles.createContainer}>
         <div className={styles.mainContainer}>
           <div>
-            <h1>Create New Item</h1>
-            <span className={styles.grayFont}>
+            <h1>게시판 글쓰기</h1>
+            {/* <span className={styles.grayFont}>
               <span style={{ fontSize: "10px" }} className={styles.require}>
                 *
               </span>{" "}
               Required fields
-            </span>
-          </div>
-          <Divider />
-          <div>
-            <p className={styles.contentFont}>
-              Image{" "}
-              <span style={{ fontSize: "16px" }} className={styles.require}>
-                *
-              </span>
-            </p>
-            <p className={styles.grayFont}>File types supported: JPG, PNG, GIF, SVG, MP4, WEBM, MP3, WAV, OGG, GLB, GLTF. Max size: 100 MB</p>
-            <div className={styles.selectFile}>
-              <label for="fileInput">
-                {image ? <img for="fileInput" src={image} alt="preview image" className={styles.selectedImage} /> : <Icon name="file image outline" size="huge" />}
-              </label>
-              <input type="file" name="file" onChange={onChange} id="fileInput" />
-            </div>
-            <br></br>
-            <div>{fileUrl ? <div>IPFS Link: {fileUrl}</div> : ""}</div>
-          </div>
-          <br></br>
-          <div className={styles.contentContainer}>
-            <p className={styles.contentFont}>
-              Title{" "}
-              <span style={{ fontSize: "16px" }} className={styles.require}>
-                *
-              </span>
-            </p>
+            </span> */}
             <Input
-              placeholder="Item name"
+              placeholder="제목을 입력해 주세요."
               fluid
               size="big"
               onChange={(e) => {
@@ -134,39 +107,54 @@ export default function write({ userInfo }) {
               }}
             />
           </div>
+          <Divider />
+
           <div className={styles.contentContainer}>
-            <p className={styles.contentFont}>Description</p>
+            {/* <p className={styles.contentFont}>Description</p> */}
             <TextArea
-              placeholder="Tell us more"
-              style={{ minHeight: 100, width: "100%", borderColor: " rgba(0,0,0,0.6)" }}
+              placeholder="내용을 입력하세요"
+              style={{ minHeight: 400, width: "100%", borderColor: "rgba(0,0,0,0.6)" }}
               onChange={(e) => {
                 setDesc(e.target.value);
               }}
             />
           </div>
-          {/* <div className={styles.contentContainer}>
-            <p className={styles.contentFont}>
-              Account{" "}
-              <span style={{ fontSize: "16px" }} className={styles.require}>
-                *
-              </span>
-            </p>
-            <p className={styles.contentValue}>{userInfo.Address}</p>
-          </div>
           <div className={styles.contentContainer}>
-            <p className={styles.contentFont}>
-              Block Address{" "}
-              <span style={{ fontSize: "16px" }} className={styles.require}>
-                *
-              </span>
-            </p>
-            <p className={styles.contentValue}>connect Block Address</p>
-          </div> */}
+            {isWantImage ? (
+              <div className={styles.imageContainer}>
+                <p className={styles.greyFont}>대표이미지 추가해 주세요.</p>
+                <div className={styles.selectFile}>
+                  <label for="fileInput">
+                    {image ? <img for="fileInput" src={image} alt="preview image" className={styles.selectedImage} /> : <Icon name="file image outline" size="huge" />}
+                  </label>
+                  <input type="file" name="file" onChange={onChange} id="fileInput" />
+                </div>
+                <br></br>
+                <div>{fileUrl ? <div>IPFS Link: {fileUrl}</div> : ""}</div>{" "}
+                <Button
+                  onClick={() => {
+                    setIsWantImage(!isWantImage);
+                  }}
+                  negative
+                >
+                  대표이미지 설정 취소하기
+                </Button>
+              </div>
+            ) : (
+              <div
+                onClick={() => {
+                  setIsWantImage(!isWantImage);
+                }}
+              >
+                <Message info header="대표 이미지를 설정하시겠습니까 ?" />
+              </div>
+            )}
+          </div>
 
           <div className={styles.buttonContainer}>
             <Button size="big" icon labelPosition="left" onClick={moveToHome}>
               <Icon name="arrow left" />
-              Go Home
+              홈으로
             </Button>
             <Button size="big" content="게시글 생성" primary onClick={createPost} />
           </div>

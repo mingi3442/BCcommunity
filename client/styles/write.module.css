@@ -27,10 +27,6 @@
 .mainContainer h1 {
     font-weight: 700;
 }
-.require {
-    color: crimson;
-    /* font-size: 10px; */
-}
 
 .selectFile label {
     display: flex; 
@@ -98,4 +94,11 @@
     margin: 25px 0;
     font-weight: 600;
     font-size: 34px;
+}
+
+.imageContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
