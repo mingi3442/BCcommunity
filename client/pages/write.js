@@ -50,10 +50,11 @@ export default function write({ userInfo }) {
         owner: userInfo._id,
         title: title,
         desc: desc,
+        img: fileUrl,
       })
       .then((res) => {
-        console.log(res);
-        // console.log("userInfo: ", userInfo);
+        // console.log(res);
+        router.push("/");
       })
       .catch((err) => {
         if (err) {
@@ -92,12 +93,6 @@ export default function write({ userInfo }) {
         <div className={styles.mainContainer}>
           <div>
             <h1>게시판 글쓰기</h1>
-            {/* <span className={styles.grayFont}>
-              <span style={{ fontSize: "10px" }} className={styles.require}>
-                *
-              </span>{" "}
-              Required fields
-            </span> */}
             <Input
               placeholder="제목을 입력해 주세요."
               fluid

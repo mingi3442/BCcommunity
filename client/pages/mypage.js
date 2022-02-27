@@ -109,7 +109,7 @@ function mypage({ userInfo }) {
           </div>
           <div className={styles.contentContainer}>
             <div className={styles.videoContainer}>
-              <p className={styles.contentFont}>My Videos</p>
+              <p className={styles.contentFont}>내 게시글</p>
             </div>
           </div>
         </div>

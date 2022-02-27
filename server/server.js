@@ -6,6 +6,8 @@ const lightwallet = require("eth-lightwallet");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
+const Web3 = require("web3");
+const web3 = new Web3("HTTP://127.0.0.1:7545");
 
 require("dotenv").config();
 app.use(bodyParser.json()); // 이거 덕분에 바디에 데이터 들어감 ㅠㅠ
@@ -64,9 +66,57 @@ passport.deserializeUser(function (username, done) {
   done(null, {});
 });
 
-app.get("/getdata", (req, res) => {
+app.get("/getdata", async (req, res) => {
+  const accounts = await web3.eth.getAccounts();
+  // console.log(accounts);
   return res.send("Responding from server!");
 });
+app.post("/test", async (req, res) => {
+  //가나슈 게졍
+  const sendAccount = process.env.GANACHE_ADDRESS;
+  const privateKey = process.env.GANACHE_PRIVATEKEY;
+  // console.log(req.body.address);
+  // const accounts = await web3.eth.getAccounts();
+  const receiveAccount = req.body.address;
+  const nonce = await web3.eth.getTransactionCount(sendAccount, "latest");
+  const tx = {
+    from: sendAccount,
+    to: receiveAccount,
+    nonce: nonce,
+    gas: 500000,
+    value: web3.utils.toWei("0.1", "ether"),
+  };
+  const signPromise = web3.eth.accounts.signTransaction(tx, privateKey);
+  console.log(await signPromise);
+  // const signPromise = web3.eth.accounts.signTransaction(tx, privateKey);
+  signPromise
+    .then((signedTx) => {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction, async function (err, hash) {
+        if (!err) {
+          const balance = await web3.eth.getBalance(receiveAccount);
+          res.json({
+            message: "Facuet Successed",
+            data: {
+              userName: "test12345",
+              address: receiveAccount,
+              balance: web3.utils.fromWei(balance, "ether") + "eth",
+              txHash: hash,
+            },
+          });
+        } else {
+          console.log("실패!!");
+        }
+      });
+    })
+    .catch((err) => {
+      console.log("Promise failed:", err);
+      res.json({
+        message: "Error: Faucet Transaction Faield",
+      });
+    });
+  //   res.send("Responding from server!");
+});
+
 app.get("/getposts", (req, res) => {
   db.collection("posts")
     .find({})
@@ -89,7 +139,7 @@ app.post("/write", async (req, res) => {
   db.collection("postCounter").findOne({ name: "totalPost" }, function (err, result) {
     console.log(req.body);
     var total = result.total;
-    var post = { _id: total + 1, owner: req.body.owner, ownerName: req.body.ownerName, title: req.body.title, desc: req.body.desc, createAt: new Date() };
+    var post = { _id: total + 1, owner: req.body.owner, ownerName: req.body.ownerName, title: req.body.title, desc: req.body.desc, img: req.body.img, createAt: new Date() };
     db.collection("posts").insertOne(post, function (err, result) {
       console.log(err);
       console.log("insert:", result);
@@ -145,3 +195,13 @@ app.post("/signup", async (req, res) => {
     console.log("NewWallet ==>>>> " + exception);
   }
 });
+app.delete("/delete", (req, res) => {
+  postId = parseInt(req.body.postId);
+  console.log(typeof postId);
+  db.collection("posts").deleteOne({ _id: postId }, function (err, result) {
+    console.log("삭제완료");
+  });
+  res.send("삭제완료");
+});
+
+app.post("/ehtFaucet", (req, res) => {});

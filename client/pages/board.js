@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import styles from "../styles/board.module.css";
 import { useRouter } from "next/router";
-import { Divider } from "semantic-ui-react";
+import { Divider, Item } from "semantic-ui-react";
 import Link from "next/link";
 
 export default function board() {
@@ -13,24 +14,33 @@ export default function board() {
     });
   }, []);
   return (
-    <div>
-      <div>board</div>
-      <Divider />
-      {posts.map((post) => {
-        return (
-          <div key={post._id}>
-            <Link href={`/post/${post._id}`}>
-              <div>
-                <div>{post.title}</div>
-                <div>{post.desc}</div>
-                <div>{post.ownerName}</div>
-                <div>{post.createAt}</div>
-              </div>
-            </Link>
-            <Divider />
-          </div>
-        );
-      })}
+    <div className={styles.container}>
+      <div className={styles.mainContainer}>
+        <div className={styles.contentFont}>게시판 전체 글</div>
+        <Divider />
+        <Item.Group>
+          {posts.map((post) => {
+            return (
+              <>
+                <Link href={`/post/${post._id}`}>
+                  <Item key={post._id}>
+                    <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
+                    <Item.Content>
+                      <Item.Header>{post.title}</Item.Header>
+                      <Item.Meta>
+                        <span>{post.ownerName}</span>
+                        {/* <span className="stay">1 Month</span> */}
+                      </Item.Meta>
+                      <Item.Description>{post.createAt}</Item.Description>
+                    </Item.Content>
+                  </Item>
+                </Link>
+                <Divider />
+              </>
+            );
+          })}
+        </Item.Group>
+      </div>
     </div>
   );
 }

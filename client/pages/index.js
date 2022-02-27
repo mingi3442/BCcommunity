@@ -3,17 +3,24 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import axios from "axios";
 import { useEffect } from "react";
+import { Button } from "semantic-ui-react";
 
-export default function Home({ setIsLogin, setUserInfo }) {
+export default function Home({ userInfo, setIsLogin, setUserInfo }) {
   useEffect(() => {
     axios.get("http://localhost:8000/getdata").then((res) => {
       console.log(res.data);
     });
   }, []);
   const onClick = () => {
-    axios.get("http://localhost:8000/getdata").then((res) => {
-      console.log(res.data);
-    });
+    axios
+      .post("http://localhost:8000/test", {
+        username: userInfo.username,
+        address: userInfo.address,
+        privateKey: userInfo.privateKey,
+      })
+      .then((res) => {
+        console.log(res);
+      });
   };
   const logout = () => {
     axios.get("./api/logout").then((res) => {
@@ -26,7 +33,7 @@ export default function Home({ setIsLogin, setUserInfo }) {
   };
   return (
     <>
-      <button onClick={onClick} />
+      <Button onClick={onClick}>TEST</Button>
       <button onClick={logout}>LOG OUT</button>
     </>
   );

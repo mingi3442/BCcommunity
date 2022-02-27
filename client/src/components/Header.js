@@ -3,8 +3,9 @@ import { Input, Icon, Label, Menu } from "semantic-ui-react";
 import styles from "./Header.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import axios from "axios";
 
-export default function Header({ isLogin }) {
+export default function Header({ isLogin, setIsLogin, setUserInfo }) {
   const router = useRouter();
   console.log(router.pathname);
   const [activeItem, setActiveItem] = useState("");
@@ -31,75 +32,16 @@ export default function Header({ isLogin }) {
     setIsLogin(!isLogin);
     tokenSave(account);
   };
-  // return (
-  //   <div className={styles.header}>
-  //     <div className={styles.Container}>
-  //       <Link href="/">
-  //         <a className={styles.logo}>
-  //           <img src="/logo.png" alt="logo" style={{ display: "flex", width: "40px", margin: "25px" }} />
-  //           <span>Blockmunity</span>
-  //         </a>
-  //       </Link>
-  //       {/* <Input icon="search" placeholder="Search items, collections, and accounts" style={{ width: "50rem", height: "45px" }} /> */}
-  //       <ul className={styles.nav}>
-  //         <li>
-  //           <div>{!isLogin ? <Label color="red"> Unconnected Accout</Label> : <Label color="green"> Connected Accout</Label>}</div>
-  //         </li>
-  //         <li>
-  //           <Link href="/board">
-  //             <a>게시판</a>
-  //           </Link>
-  //         </li>
-  //         <li>
-  //           <Link href="/write">
-  //             <a>글쓰기</a>
-  //           </Link>
-  //         </li>
-  //         <li>
-  //           <Link href="/signup">
-  //             <a>회원가입</a>
-  //           </Link>
-  //         </li>
-  //         <li>
-  //           <Link href="/login">
-  //             <a>로그인</a>
-  //           </Link>
-  //         </li>
-  //         <li>
-  //           <Link href="/mypage">
-  //             <a>마이페이지</a>
-  //           </Link>
-  //         </li>
-  //         {/* <li>
-  //           <Link href="/mypage">
-  //             <Icon name="user circle outline" size="large" />
-  //           </Link>
-  //         </li> */}
-  //         {/* <li>
-  //           <div onClick={loginButton}>
-  //             <img className={styles.icon} src="/images/icon_metamask.jpg" />
-  //           </div>
-  //         </li>
-  //         <li>
-  //           <div onClick={kaikasLoginButton}>
-  //             <img className={styles.icon} src="/images/icon_kaikas.png" />
-  //           </div>
-  //         </li> */}
-  //         {/* <li>
-  //           {isLogin ? (
-  //             <div onClick={loginButton}>
-  //               <Icon name="sign-out" size="large" />
-  //             </div>
-  //           ) : (
-  //             <div onClick={loginButton}>
-  //               <Icon name="sign-in" size="large" />
-  //             </div>
-  //           )}
-  //         </li> */}
-  //       </ul>
-  //     </div>
-  //   </div>
-  // );
+  const logout = () => {
+    axios.get("./api/logout").then((res) => {
+      if (res.status === 200) {
+        console.log("logout!!");
+      }
+    });
+    setIsLogin(false);
+    setUserInfo({});
+  };
+
   return (
     <>
       <Link href="/">
@@ -119,7 +61,11 @@ export default function Header({ isLogin }) {
             <a>게시판</a>
           </Link>
         </Menu.Item>
-
+        <Menu.Item active={activeItem === "/exchange"}>
+          <Link href="/exchange">
+            <a>교환소</a>
+          </Link>
+        </Menu.Item>
         <Menu.Item active={activeItem === "/wirte"}>
           <Link href="/write">
             <a>글쓰기</a>
@@ -127,11 +73,18 @@ export default function Header({ isLogin }) {
         </Menu.Item>
         <Menu.Menu position="right">
           {isLogin ? (
-            <Menu.Item active={activeItem === "/mypage"}>
-              <Link href="/mypage">
-                <a>마이페이지</a>
-              </Link>
-            </Menu.Item>
+            <>
+              <Menu.Item>
+                <div onClick={logout}>
+                  <a>로그아웃</a>
+                </div>
+              </Menu.Item>
+              <Menu.Item active={activeItem === "/mypage"}>
+                <Link href="/mypage">
+                  <a>마이페이지</a>
+                </Link>
+              </Menu.Item>
+            </>
           ) : (
             <>
               <Menu.Item active={activeItem === "/login"}>
