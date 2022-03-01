@@ -46,6 +46,7 @@ export default function write({ userInfo }) {
     // console.log(userInfo._id);
     await axios
       .post("http://localhost:8000/write", {
+        ownerAddress: userInfo.address,
         ownerName: userInfo.username,
         owner: userInfo._id,
         title: title,

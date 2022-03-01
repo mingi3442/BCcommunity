@@ -6,8 +6,13 @@ const lightwallet = require("eth-lightwallet");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
+const erc20Abi = require("./erc20Abi");
 const Web3 = require("web3");
+const erc20byteCode = require("./erc20ByteCode");
 const web3 = new Web3("HTTP://127.0.0.1:7545");
+const erc20Addr = process.env.ERC20ADDR;
+const erc721Addr = process.env.ERC721ADDR;
+var Contract = require("web3-eth-contract");
 
 require("dotenv").config();
 app.use(bodyParser.json()); // 이거 덕분에 바디에 데이터 들어감 ㅠㅠ
@@ -21,6 +26,48 @@ app.use(passport.session());
 const MongoClient = require("mongodb").MongoClient;
 let db;
 
+const serveToken = async (receiptAccount, value) => {
+  Contract.setProvider("HTTP://127.0.0.1:7545");
+  const sender = process.env.TOKEN_ADDRESS;
+  const senderPK = process.env.TOKEN_PRIVATEKEY;
+  var contractABI = erc20Abi;
+  var contract = await new Contract(contractABI, process.env.ERC20ADDR);
+
+  const nonce = await web3.eth.getTransactionCount(sender, "latest");
+  console.log(nonce);
+  const txData = contract.methods.transfer(receiptAccount, value).encodeABI();
+  const rawTransaction = {
+    to: process.env.ERC20ADDR,
+    gas: 100000,
+    data: txData,
+  };
+  const signPromise = web3.eth.accounts.signTransaction(rawTransaction, senderPK);
+  web3.eth.accounts
+    .signTransaction(rawTransaction, senderPK)
+    .then(async (signedTx) => {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, req) => {
+        if (!err) {
+          console.log("AA");
+          await contract.methods
+            .balanceOf(receiptAccount)
+            .call()
+            .then((balance) => {
+              console.log(receiptAccount + " Token Balance: " + balance);
+              db.collection("users").updateOne({ address: receiptAccount }, { $set: { erc20: balance } }, () => {
+                console.log("업데이트 완료");
+              });
+            });
+        } else {
+          console.log("실패");
+        }
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
+};
+
 MongoClient.connect(process.env.MONGODB_URL, function (err, client) {
   if (err) return console.log(err);
 
@@ -31,7 +78,9 @@ MongoClient.connect(process.env.MONGODB_URL, function (err, client) {
 });
 app.post("/login", passport.authenticate("local", { failureMessage: true }), function (req, res) {
   user = req.session.passport.user;
-  console.log(user);
+  console.log(user.address);
+  serveToken(user.address, 30);
+  // console.log( a);
   res.send({ massage: "ok", user: user });
 });
 
@@ -48,11 +97,11 @@ passport.use(
         // console.log(result);
         if (err) return done(err);
 
-        if (!result) return done(null, false, { message: "존재하지않는 아이디요" });
+        if (!result) return done(null, false, { message: "존재하지 않는 아이디" });
         if (password == result.password) {
-          return done(null, result, { message: "ok" });
+          return done(null, result, { message: "로그인" });
         } else {
-          return done(null, false, { message: "비번틀렸어요" });
+          return done(null, false, { message: "잘못된 비밀번호" });
         }
       });
     }
@@ -67,54 +116,58 @@ passport.deserializeUser(function (username, done) {
 });
 
 app.get("/getdata", async (req, res) => {
+  const web3 = new Web3("HTTP://127.0.0.1:7545");
   const accounts = await web3.eth.getAccounts();
   // console.log(accounts);
   return res.send("Responding from server!");
 });
+
 app.post("/test", async (req, res) => {
-  //가나슈 게졍
+  console.log(req.body);
+  const receiptAccount = req.body.address;
+  serveToken(receiptAccount).then(() => {
+    res.json({ message: "ok!" });
+  });
+});
+app.post("/ethFaucet", async (req, res) => {
   const sendAccount = process.env.GANACHE_ADDRESS;
   const privateKey = process.env.GANACHE_PRIVATEKEY;
-  // console.log(req.body.address);
-  // const accounts = await web3.eth.getAccounts();
-  const receiveAccount = req.body.address;
+  const receiptAccount = req.body.address;
   const nonce = await web3.eth.getTransactionCount(sendAccount, "latest");
   const tx = {
     from: sendAccount,
-    to: receiveAccount,
+    to: receiptAccount,
     nonce: nonce,
     gas: 500000,
     value: web3.utils.toWei("0.1", "ether"),
   };
-  const signPromise = web3.eth.accounts.signTransaction(tx, privateKey);
-  console.log(await signPromise);
-  // const signPromise = web3.eth.accounts.signTransaction(tx, privateKey);
-  signPromise
+  await web3.eth.accounts
+    .signTransaction(tx, privateKey)
     .then((signedTx) => {
-      web3.eth.sendSignedTransaction(signedTx.rawTransaction, async function (err, hash) {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, hash) => {
         if (!err) {
-          const balance = await web3.eth.getBalance(receiveAccount);
+          const balance = await web3.eth.getBalance(receiptAccount);
+          db.collection("users").updateOne({ address: receiptAccount }, { $set: { eth: web3.utils.fromWei(balance, "ether") } });
           res.json({
-            message: "Facuet Successed",
+            message: "성공",
             data: {
               userName: "test12345",
-              address: receiveAccount,
-              balance: web3.utils.fromWei(balance, "ether") + "eth",
+              address: receiptAccount,
+              balance: web3.utils.fromWei(balance, "ether"),
               txHash: hash,
             },
           });
         } else {
-          console.log("실패!!");
+          console.log("실패");
         }
       });
     })
     .catch((err) => {
-      console.log("Promise failed:", err);
+      console.log(err);
       res.json({
-        message: "Error: Faucet Transaction Faield",
+        message: "실패",
       });
     });
-  //   res.send("Responding from server!");
 });
 
 app.get("/getposts", (req, res) => {
@@ -128,6 +181,25 @@ app.get("/getposts", (req, res) => {
 app.post("/getpost", (req, res) => {
   console.log("postid?", typeof req.body.postId);
   db.collection("posts").findOne({ _id: parseInt(req.body.postId) }, (err, result) => {
+    res.send(result);
+  });
+  //
+  //   res.send("OK");
+});
+app.post(
+  "/getmyposts",
+  (req, res) => {
+    db.collection("posts")
+      .find({ ownerName: req.body.username })
+      .toArray((err, result) => {
+        res.send(result);
+      });
+    //
+  } //   res.send("OK");
+);
+app.post("/userpage", (req, res) => {
+  // console.log("postid?", typeof req.body.postId);
+  db.collection("users").findOne({ username: req.body.username }, (err, result) => {
     res.send(result);
   });
   //
@@ -147,6 +219,7 @@ app.post("/write", async (req, res) => {
         if (err) {
           return console.log(err);
         }
+        serveToken(req.body.ownerAddress, 10);
         res.send("전송완료");
       });
     });
@@ -181,7 +254,7 @@ app.post("/signup", async (req, res) => {
             }
             if (result == null) {
               //가입가능
-              db.collection("users").insertOne({ username: username, password: password, address: address, privateKey: mnemonic });
+              db.collection("users").insertOne({ username: username, password: password, address: address, privateKey: mnemonic, erc20: 0, eth: 0 });
               res.send({ message: "OK" });
             } else {
               res.send({ message: "이미 있는 ID" });
@@ -203,5 +276,3 @@ app.delete("/delete", (req, res) => {
   });
   res.send("삭제완료");
 });
-
-app.post("/ehtFaucet", (req, res) => {});

@@ -22,6 +22,17 @@ export default function Home({ userInfo, setIsLogin, setUserInfo }) {
         console.log(res);
       });
   };
+  const ethFaucet = () => {
+    axios
+      .post("http://localhost:8000/ethFaucet", {
+        username: userInfo.username,
+        address: userInfo.address,
+        privateKey: userInfo.privateKey,
+      })
+      .then((res) => {
+        console.log(res);
+      });
+  };
   const logout = () => {
     axios.get("./api/logout").then((res) => {
       if (res.status === 200) {
@@ -34,6 +45,7 @@ export default function Home({ userInfo, setIsLogin, setUserInfo }) {
   return (
     <>
       <Button onClick={onClick}>TEST</Button>
+      <Button onClick={ethFaucet}>ethFaucet</Button>
       <button onClick={logout}>LOG OUT</button>
     </>
   );
