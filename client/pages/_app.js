@@ -11,6 +11,8 @@ function MyApp({ Component, pageProps }) {
     password: "aaa",
     address: "0xaf846d6ab8232658911a2011ca020f165b1e78f2",
     privateKey: "evolve file type enemy sheriff shallow cactus arrive another light lady garbage",
+    eth: 0.12,
+    erc20: 210,
   });
   const [isLogin, setIsLogin] = useState(false);
 

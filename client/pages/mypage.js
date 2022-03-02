@@ -43,24 +43,6 @@ function mypage({ userInfo }) {
   const clickSende20 = () => {
     setSendErc20Ok(!sendErc20Ok);
   };
-  // return (
-  //   <Card>
-  //     <Image src="./avatar_basic.png" wrapped ui={false} />
-  //     <Card.Content>
-  //       <Card.Header>{userInfo.username}</Card.Header>
-  //       <Card.Meta>
-  //         <span className="date">Joined in 2015</span>
-  //       </Card.Meta>
-  //       <Card.Description>Matthew is a musician living in Nashville.</Card.Description>
-  //     </Card.Content>
-  //     <Card.Content extra>
-  //       <a>
-  //         <Icon name="ethereum" />
-  //         {userInfo.address}
-  //       </a>
-  //     </Card.Content>
-  //   </Card>
-  // );
 
   return (
     <div>
@@ -100,7 +82,7 @@ function mypage({ userInfo }) {
               <Item.Group>
                 {myPosts.map((post) => {
                   return (
-                    <>
+                    <div key={post._id}>
                       <Link href={`/post/${post._id}`}>
                         <Item key={post._id}>
                           <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
@@ -115,7 +97,7 @@ function mypage({ userInfo }) {
                         </Item>
                       </Link>
                       <Divider />
-                    </>
+                    </div>
                   );
                 })}
               </Item.Group>

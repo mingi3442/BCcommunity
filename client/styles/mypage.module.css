@@ -32,11 +32,18 @@
 }
 .postContainer{
     width: 50%;
+    height: 100%;
     display: flex;
     margin:0 30px;
     flex-direction: column;
     /* align-items: center;  */
-    justify-content: center;
+    /* justify-content: flex-start; */
+}
+.mainContainer{
+    /* min-height: fit-content; */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 .nameFont{
     font-size: 24px;

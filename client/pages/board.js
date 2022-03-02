@@ -10,7 +10,7 @@ export default function board() {
   useEffect(() => {
     axios.get("http://localhost:8000/getposts").then((res) => {
       console.log(res.data);
-      setPosts(res.data);
+      setPosts(res.data.reverse());
     });
   }, []);
   return (
@@ -21,9 +21,9 @@ export default function board() {
         <Item.Group>
           {posts.map((post) => {
             return (
-              <>
+              <div key={post._id}>
                 <Link href={`/post/${post._id}`}>
-                  <Item key={post._id}>
+                  <Item>
                     <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
                     <Item.Content>
                       <Item.Header>{post.title}</Item.Header>
@@ -36,7 +36,7 @@ export default function board() {
                   </Item>
                 </Link>
                 <Divider />
-              </>
+              </div>
             );
           })}
         </Item.Group>

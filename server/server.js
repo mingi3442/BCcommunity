@@ -33,15 +33,14 @@ const serveToken = async (receiptAccount, value) => {
   var contractABI = erc20Abi;
   var contract = await new Contract(contractABI, process.env.ERC20ADDR);
 
-  const nonce = await web3.eth.getTransactionCount(sender, "latest");
-  console.log(nonce);
+  // const nonce = await web3.eth.getTransactionCount(sender, "latest");
+  // console.log(nonce);
   const txData = contract.methods.transfer(receiptAccount, value).encodeABI();
   const rawTransaction = {
     to: process.env.ERC20ADDR,
     gas: 100000,
     data: txData,
   };
-  const signPromise = web3.eth.accounts.signTransaction(rawTransaction, senderPK);
   web3.eth.accounts
     .signTransaction(rawTransaction, senderPK)
     .then(async (signedTx) => {
@@ -53,7 +52,7 @@ const serveToken = async (receiptAccount, value) => {
             .call()
             .then((balance) => {
               console.log(receiptAccount + " Token Balance: " + balance);
-              db.collection("users").updateOne({ address: receiptAccount }, { $set: { erc20: balance } }, () => {
+              db.collection("users").updateOne({ address: receiptAccount }, { $set: { erc20: parseInt(balance) } }, () => {
                 console.log("업데이트 완료");
               });
             });
@@ -122,12 +121,103 @@ app.get("/getdata", async (req, res) => {
   return res.send("Responding from server!");
 });
 
-app.post("/test", async (req, res) => {
-  console.log(req.body);
-  const receiptAccount = req.body.address;
-  serveToken(receiptAccount).then(() => {
-    res.json({ message: "ok!" });
+app.post("/sendtoken", async (req, res) => {
+  Contract.setProvider("HTTP://127.0.0.1:7545");
+  var contractABI = erc20Abi;
+  var contract = await new Contract(contractABI, process.env.ERC20ADDR);
+  const value = req.body.value;
+  const reciptUser = req.body.reciptUser;
+  const senderAccount = req.body.address;
+  const senderPK = req.body.privateKey;
+  db.collection("users").findOne({ username: reciptUser }, async (err, result) => {
+    const reciptAddress = result.address;
+    const txData = contract.methods.transfer(reciptAddress, value).encodeABI();
+    const rawTransaction = {
+      to: process.env.ERC20ADDR,
+      gas: 100000,
+      data: txData,
+    };
+    web3.eth.accounts
+      .signTransaction(rawTransaction, senderPK)
+      .then(async (signedTx) => {
+        web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, req) => {
+          if (!err) {
+            await contract.methods
+              .balanceOf(reciptAddress)
+              .call()
+              .then((balance) => {
+                console.log(reciptAddress + " Token Balance: " + balance);
+                db.collection("users").updateOne({ address: reciptAddress }, { $set: { erc20: parseInt(balance) } }, () => {
+                  console.log("상대 업데이트 완료");
+                });
+                db.collection("users").updateOne({ address: senderAccount }, { $inc: { erc20: -1 * value } }, () => {
+                  console.log("본인 업데이트 완료");
+                });
+              });
+          } else {
+            console.log("실패", err);
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
   });
+});
+app.post("/aa", async (req, res) => {
+  // console.log(req.body.privateKey);
+  Contract.setProvider("HTTP://127.0.0.1:7545");
+  const server = process.env.TOKEN_ADDRESS;
+  const serverPK = process.env.TOKEN_PRIVATEKEY;
+  var contractABI = erc20Abi;
+  var contract = await new Contract(contractABI, process.env.ERC20ADDR);
+  const value = req.body.value;
+  const senderAccount = req.body.address;
+  const senderPK = req.body.privateKey;
+  const reciptAddress = req.body.reciptAddress;
+  // const nonce = await web3.eth.getTransactionCount(server, "latest");
+  // console.log(nonce);
+  const txData = contract.methods.approve(server, value).encodeABI();
+  const rawTransaction = {
+    to: process.env.ERC20ADDR,
+    gas: 100000,
+    data: txData,
+  };
+  web3.eth.accounts
+    .signTransaction(rawTransaction, senderPK)
+    .then(async (signedTx) => {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, req) => {
+        if (!err) {
+          txData = contract.methods.transferFrom(server, reciptAddress, value).encodeABI();
+          rawTransaction = {
+            to: process.env.ERC20ADDR,
+            gas: 100000,
+            data: txData,
+          };
+          web3.eth.accounts.signTransaction(rawTransaction, serverPK).then(async (signedTx) => {
+            web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, req) => {
+              if (!err) {
+                await contract.methods
+                  .balanceOf(receiptAccount)
+                  .call()
+                  .then((balance) => {
+                    console.log(receiptAccount + " Token Balance: " + balance);
+                  });
+              } else {
+                console.log("2번 실패");
+              }
+            });
+          });
+        } else {
+          console.log("1번 실패");
+        }
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
 });
 app.post("/ethFaucet", async (req, res) => {
   const sendAccount = process.env.GANACHE_ADDRESS;
@@ -153,7 +243,7 @@ app.post("/ethFaucet", async (req, res) => {
             data: {
               userName: "test12345",
               address: receiptAccount,
-              balance: web3.utils.fromWei(balance, "ether"),
+              balance: parseFloat(web3.utils.fromWei(balance, "ether")),
               txHash: hash,
             },
           });
@@ -232,6 +322,7 @@ app.post("/signup", async (req, res) => {
   let password = req.body.pw;
   let mnemonic;
   let address;
+  let pk;
   //   let createAt = new Date()
 
   try {
@@ -244,17 +335,19 @@ app.post("/signup", async (req, res) => {
       },
       function (err, ks) {
         ks.keyFromPassword(password, function (err, pwDerivedKey) {
-          ks.generateNewAddress(pwDerivedKey, 1);
+          ks.generateNewAddress(pwDerivedKey);
+          ks.generateNewAddress(pwDerivedKey);
+          address = ks.getAddresses()[0];
+          pk = ks.exportPrivateKey(address, pwDerivedKey);
+          // address = ks.getAddresses().toString();
 
-          address = ks.getAddresses().toString();
-          //   let keystore = ks.serialize();
           db.collection("users").findOne({ username: username }, (err, result) => {
             if (err) {
               console.log(err);
             }
             if (result == null) {
               //가입가능
-              db.collection("users").insertOne({ username: username, password: password, address: address, privateKey: mnemonic, erc20: 0, eth: 0 });
+              db.collection("users").insertOne({ username: username, password: password, address: address.toString(), privateKey: pk, mnemonic: mnemonic, erc20: 0, eth: 0 });
               res.send({ message: "OK" });
             } else {
               res.send({ message: "이미 있는 ID" });
