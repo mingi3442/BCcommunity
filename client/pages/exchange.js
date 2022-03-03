@@ -1,13 +1,19 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Divider, Form, Icon, Input, Label } from "semantic-ui-react";
+import Nft from "../src/components/Nft";
 import styles from "../styles/exchange.module.css";
 
 export default function exchange({ setUserInfo, userInfo }) {
   const [sendErc, setSendErc] = useState("");
   const [sendUser, setSendUser] = useState("");
   const [sendError, setSendError] = useState(false);
-
+  const [nfts, setNfts] = useState([]);
+  useEffect(() => {
+    axios.get("http://localhost:8000/explore").then((res) => {
+      setNfts(res.data);
+    });
+  }, []);
   const ethFaucet = () => {
     axios
       .post("http://localhost:8000/ethFaucet", {
@@ -133,6 +139,7 @@ export default function exchange({ setUserInfo, userInfo }) {
           </div>
         </div>
         <Divider />
+        <Nft nftList={nfts} />
         {/* <div>{userInfo.eth}</div>
         <div>{userInfo.erc20}</div> */}
       </div>

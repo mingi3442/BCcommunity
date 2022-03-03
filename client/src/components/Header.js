@@ -61,14 +61,19 @@ export default function Header({ isLogin, setIsLogin, setUserInfo }) {
             <a>게시판</a>
           </Link>
         </Menu.Item>
+        <Menu.Item active={activeItem === "/wirte"}>
+          <Link href="/write">
+            <a>글쓰기</a>
+          </Link>
+        </Menu.Item>
         <Menu.Item active={activeItem === "/exchange"}>
           <Link href="/exchange">
             <a>교환소</a>
           </Link>
         </Menu.Item>
-        <Menu.Item active={activeItem === "/wirte"}>
-          <Link href="/write">
-            <a>글쓰기</a>
+        <Menu.Item active={activeItem === "/create"}>
+          <Link href="/create">
+            <a>NFT 만들기</a>
           </Link>
         </Menu.Item>
         <Menu.Menu position="right">

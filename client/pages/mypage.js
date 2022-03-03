@@ -4,10 +4,12 @@ import styles from "../styles/mypage.module.css";
 import { useRouter } from "next/router";
 import { Button, Card, Divider, Icon, Image, Item, Label } from "semantic-ui-react";
 import Link from "next/link";
+import Nft from "../src/components/Nft";
 
 function mypage({ userInfo }) {
   const [user, setUser] = useState({});
   const [myPosts, setMyPosts] = useState([]);
+  const [myNfts, setMyNfts] = useState([]);
   const router = useRouter();
   console.log(0.5 > parseFloat(user.eth));
   useEffect(() => {
@@ -28,6 +30,14 @@ function mypage({ userInfo }) {
           .then((res) => {
             console.log(res.data);
             setMyPosts(res.data);
+          });
+        axios
+          .post("http://localhost:8000/getmynfts", {
+            username: userInfo.username,
+          })
+          .then((res) => {
+            console.log(res.data);
+            setMyNfts(res.data);
           });
       } else {
         //로그인x
@@ -107,7 +117,7 @@ function mypage({ userInfo }) {
       </div>
       <div className={styles.bottomContainer}>
         <Divider />
-        ??????
+        <Nft nftList={myNfts} />
       </div>
     </div>
   );
