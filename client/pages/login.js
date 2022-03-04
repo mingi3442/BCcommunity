@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Button, Form, Grid, Header, Image, Message, Segment } from "semantic-ui-react";
+import Login from "../src/components/login";
 
 export default function login({ setUserInfo, userInfo }) {
   const router = useRouter();
@@ -34,50 +35,7 @@ export default function login({ setUserInfo, userInfo }) {
         }
       });
   };
-  return (
-    <Grid textAlign="center" style={{ height: "100vh" }} verticalAlign="middle">
-      <Grid.Column style={{ maxWidth: 450 }}>
-        <Header as="h2" color="grey" textAlign="center">
-          <Image src="/logo.png" /> Blockmunity 로그인
-        </Header>
-        <Form size="large">
-          <Segment stacked>
-            <Form.Input
-              fluid
-              icon="user"
-              iconPosition="left"
-              name="username"
-              placeholder="User ID"
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-            />
-            <Form.Input
-              fluid
-              icon="lock"
-              name="pw"
-              iconPosition="left"
-              placeholder="Password"
-              type="password"
-              onChange={(e) => {
-                setPw(e.target.value);
-              }}
-            />
-
-            <Button onClick={onClick} primary fluid size="large">
-              Login
-            </Button>
-          </Segment>
-        </Form>
-
-        <div style={{ marginTop: "22px" }}>
-          <Link href="/signup">
-            <Button content="회원 가입" fluid size="big" />
-          </Link>
-        </div>
-      </Grid.Column>
-    </Grid>
-  );
+  return <Login setUserInfo={setUserInfo} userInfo={userInfo} />;
 }
 
 // export default LoginForm;

@@ -22,7 +22,7 @@ export default function exchange({ setUserInfo, userInfo }) {
       })
       .then((res) => {
         setUserInfo({ ...userInfo, eth: res.data.balance });
-        console.log(userInfo);
+        refresh();
         // console.log(res.balance);
       });
   };
@@ -40,13 +40,28 @@ export default function exchange({ setUserInfo, userInfo }) {
         console.log(res);
       });
   };
-
+  const refresh = () => {
+    axios
+      .post("http://localhost:8000/reload", {
+        username: userInfo.username,
+      })
+      .then((res) => {
+        setUserInfo(res.data.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div className={styles.container}>
       <div className={styles.mainContainer}>
-        <div className={styles.titleFont}>EXCHAGE</div>
-        <p>"토큰이란 ? 토큰에대한 설명(토큰 받는 방법, 모아서 nft구매 등등.."</p>
-        <p>"eth란 ? 교환하는데 필요하며 0.1 미만일 경우 무료로 발급 가능"</p>
+        <p className={styles.titleFont}>EXCHAGE</p>
+        <div styles={{ margin: "5px" }}>
+          <span className={styles.grayFont}>BMT란 ?</span>
+          <p className={styles.grayFont}>로그인, 게시물을 작성시 얻을 수 있으며 모은 BMT로는 다른유저에게 전송, NFT를 생성 및 구매 가능하다!</p>
+          <span className={styles.grayFont}>eth란 ?</span>
+          <p className={styles.grayFont}>0.1미만 보유시 충전창이 나타나며 활동에 필요한 기본 급액이다 </p>
+        </div>
         <Divider />
         <div className={styles.topContainer}>
           <div className={styles.balanceContainer}>
@@ -72,7 +87,7 @@ export default function exchange({ setUserInfo, userInfo }) {
           </div>
           <div className={styles.ercContainer}>
             <div className={styles.balanceTop}>
-              <div className={styles.titleFont}>나의 ERC20</div>
+              <div className={styles.titleFont}>나의 BMT</div>
               <Divider />
             </div>
             <div className={styles.balanceBottom}>
@@ -83,7 +98,7 @@ export default function exchange({ setUserInfo, userInfo }) {
           </div>
           <div className={styles.sendContainer}>
             <div className={styles.balanceTop}>
-              <div className={styles.titleFont}>토큰 전송하기</div>
+              <div className={styles.titleFont}>BMT 전송하기</div>
               <Divider />
             </div>
             <div className={styles.balanceBottom}>
@@ -139,9 +154,8 @@ export default function exchange({ setUserInfo, userInfo }) {
           </div>
         </div>
         <Divider />
-        <Nft nftList={nfts} />
-        {/* <div>{userInfo.eth}</div>
-        <div>{userInfo.erc20}</div> */}
+        <p className={styles.titleFont}>NFT 둘러보기</p>
+        <Nft nftList={nfts} isMine={false} />
       </div>
     </div>
   );

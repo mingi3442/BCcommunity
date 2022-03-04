@@ -21,7 +21,7 @@ export default function board() {
         <Item.Group>
           {posts.map((post) => {
             return (
-              <div key={post._id}>
+              <>
                 <Link href={`/post/${post._id}`}>
                   <Item>
                     <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
@@ -36,7 +36,7 @@ export default function board() {
                   </Item>
                 </Link>
                 <Divider />
-              </div>
+              </>
             );
           })}
         </Item.Group>

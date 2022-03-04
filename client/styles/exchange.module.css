@@ -89,3 +89,10 @@
     font-size: 24px;
     font-weight: 500;
 }
+.grayFont{
+    color: rgba(0, 0, 0, 0.6);
+}
+.require {
+    color: crimson;
+    /* font-size: 10px; */
+}

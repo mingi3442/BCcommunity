@@ -27,6 +27,8 @@ export default function write({ userInfo }) {
   }, []);
 
   const client = create("https://ipfs.infura.io:5001/api/v0");
+  console.log(fileUrl);
+  console.log(image);
 
   const moveToHome = () => {
     router.push("/");
@@ -63,30 +65,6 @@ export default function write({ userInfo }) {
         }
       });
   };
-
-  // const createNewNFT = async () => {
-  //   let tokenContract;
-  //   let newTokenId;
-
-  //   if (walletType === "eth") {
-  //     tokenContract = await new web3.eth.Contract(erc721Abi, newErc721addr, {
-  //       from: account,
-  //     });
-  //     tokenContract.options.address = newErc721addr;
-  //     newTokenId = await tokenContract.methods.mintNFT(account, fileUrl).send();
-  //   } else {
-  //     tokenContract = await new caver.klay.Contract(erc721Abi, newKip17addr, {
-  //       from: account,
-  //     });
-  //     tokenContract.options.address = newKip17addr;
-  //     newTokenId = await tokenContract.methods.mintNFT(account, fileUrl).send({ from: account, gas: 0xf4240 });
-  //   }
-  //   const name = await tokenContract.methods.name().call();
-  //   const symbol = await tokenContract.methods.symbol().call();
-  //   const totalSupply = await tokenContract.methods.totalSupply().call();
-
-  //   setIsMint(true);
-  // };
 
   return (
     <div className={styles.container}>
@@ -126,7 +104,7 @@ export default function write({ userInfo }) {
                   <input type="file" name="file" onChange={onChange} id="fileInput" />
                 </div>
                 <br></br>
-                <div>{fileUrl ? <div>IPFS Link: {fileUrl}</div> : ""}</div>{" "}
+                {/* <div>{fileUrl ? <div>IPFS Link: {fileUrl}</div> : ""}</div>{" "} */}
                 <Button
                   onClick={() => {
                     setIsWantImage(!isWantImage);

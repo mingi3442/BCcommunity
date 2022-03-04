@@ -45,7 +45,7 @@ export default function Header({ isLogin, setIsLogin, setUserInfo }) {
   return (
     <>
       <Link href="/">
-        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", cursor: "pointer" }}>
           <img src="/logo.png" alt="logo" style={{ display: "flex", width: "40px", margin: "25px " }} />
           <a style={{ fontSize: "24px", fontWeight: "600" }}>Blockmunity</a>
         </div>

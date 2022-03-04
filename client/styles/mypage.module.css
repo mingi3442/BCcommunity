@@ -81,6 +81,9 @@
     flex-direction: column;
     
 }
+.bottomContainer{
+    width: 90%;
+}
 
 
 .contentFont{
@@ -88,3 +91,7 @@
     font-weight: 500;
 }
 
+.grayFont{
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.6);
+}

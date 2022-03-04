@@ -2,12 +2,12 @@ import styles from "./Nft.module.css";
 import { Icon } from "semantic-ui-react";
 import Link from "next/link";
 
-function Nft({ nftList }) {
+function Nft({ nftList, isMine }) {
   return (
     <div className={styles.mainContainer}>
       {nftList.map((token) => {
         return (
-          <Link href="/">
+          <Link href={isMine ? `/mynfts/${token._id}` : `/buyable/${token._id}`}>
             <div key={token._id} className={styles.tokenContainer}>
               <img
                 src={token.img}
@@ -23,8 +23,11 @@ function Nft({ nftList }) {
                   </div>
                 </div>
                 <div style={{ marginRight: "20px" }}>
-                  <Icon name="info circle" size="large" />
-                  <p>{token.ownerName}</p>
+                  {/* <Icon name="info circle" size="large" /> */}
+                  <p className={styles.grayFont}>
+                    <Icon name="chain" size="mini" />
+                    {token.price}
+                  </p>
                 </div>
               </div>
             </div>

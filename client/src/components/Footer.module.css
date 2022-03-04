@@ -1,0 +1,29 @@
+.footerContainer{
+    box-shadow: 2px 1px 1px rgba(0,0,0,0.16), 2px 1px 1px rgba(0,0,0,0.23);
+    background-color: #E5E8EB;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
+    /* left: 0; */
+}
+.bottomContainer{
+    width: 80%;
+    border-top: 1px solid rgba(255,255,255,0.5);
+    height: 5em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    color: #000;
+    
+}
+.bottomContainer ul {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+}
+.bottomContainer ul li{
+    margin-right:  10px;
+}
