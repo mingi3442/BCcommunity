@@ -1,12 +1,14 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styles from "../../styles/nfts.module.css";
-import { Button, Divider, Icon, Input } from "semantic-ui-react";
+import { Button, Divider, Icon, Input, Label } from "semantic-ui-react";
 import axios from "axios";
 
-const Post = () => {
+const Post = ({ userInfo }) => {
+  console.log(userInfo);
   const [token, setToken] = useState([]);
   const [to, setTo] = useState("");
+  const [price, setPrice] = useState("");
   const router = useRouter();
   const { id } = router.query;
   console.log(to);
@@ -23,8 +25,9 @@ const Post = () => {
   const sendNft = () => {
     axios
       .post("http://localhost:8000/sendnft", {
+        ownerAddress: userInfo.address,
+        ownerPK: userInfo.privateKey,
         tokenId: id,
-        ownerAddress: token.ownerAddress,
         reciptUserName: to,
       })
       .then((res) => {
@@ -36,40 +39,23 @@ const Post = () => {
         return error;
       });
   };
-  console.log(token.ownerAddress);
-  //   const sendToken = async (tokenId) => {
-  //     const tokenContract = "";
-  //     if (walletType === "eth") {
-  //       tokenContract = await new web3.eth.Contract(erc721Abi, newErc721addr, {
-  //         from: account,
-  //       });
-  //       tokenContract.options.address = newErc721addr;
-  //       tokenContract.methods
-  //         .transferFrom(account, to, token.id)
-  //         .send({
-  //           from: account,
-  //         })
-  //         .on("receipt", (receipt) => {
-  //           setTo("");
-  //           router.push("/");
-  //         });
-  //     } else {
-  //       tokenContract = await new caver.klay.Contract(kip17Abi, newKip17addr, {
-  //         from: account,
-  //       });
-  //       tokenContract.options.address = newKip17addr;
-  //       tokenContract.methods
-  //         .transferFrom(account, to, token.id)
-  //         .send({
-  //           from: account,
-  //           gas: 0xf4240, //왜 이가격인지는 모르겠습니다....
-  //         })
-  //         .on("receipt", (receipt) => {
-  //           setTo("");
-  //           router.push("/");
-  //         });
-  //     }
-  //   };
+  const saleNft = () => {
+    axios
+      .post("http://localhost:8000/saleNft", {
+        tokenId: id,
+        ownerAddress: userInfo.address,
+        ownerPK: userInfo.privateKey,
+        price: price,
+      })
+      .then((res) => {
+        console.log("전송 완료!");
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log(error);
+        return error;
+      });
+  };
 
   return (
     <div className={styles.container}>
@@ -96,33 +82,39 @@ const Post = () => {
           </div>
         </div>
         <div className={styles.tokenTransferContainer}>
-          <h1>Send</h1>
+          <h1>NFT 정보</h1>
           <Divider />
           <div className={styles.contentContainer}>
-            <p className={styles.contentFont}>Token ID</p>
+            <p className={styles.contentFont}>NFT ID</p>
             <p style={{ fontSize: "24px" }}>{token._id}</p>
-            <p className={styles.contentFont}>
-              From{" "}
-              <span style={{ fontSize: "16px" }} className={styles.require}>
-                *
-              </span>
-            </p>
+            <p className={styles.contentFont}>Owner </p>
             <p className={styles.contentValue}>{token.ownerName}</p>
-          </div>
-          <div className="tokenTransfer">
-            <p className={styles.contentFont}>To</p>{" "}
-            <Input
-              placeholder="Account Address"
-              fluid
-              size="large"
-              value={to}
-              onChange={(e) => {
-                setTo(e.target.value);
-              }}
-            />
-          </div>
-          <div className={styles.btnContainer}>
-            <Button content="Send Token" icon="right arrow" size="big" labelPosition="right" onClick={sendNft} />
+            <p>전송하기</p>
+            <div className={styles.btnContainer}>
+              <Input
+                placeholder="User Name"
+                size="medium"
+                value={to}
+                onChange={(e) => {
+                  setTo(e.target.value);
+                }}
+              />
+              <Button content="전송하기" icon="right arrow" size="medium" labelPosition="right" onClick={sendNft} />
+            </div>
+            <p>판매하기</p>
+            <div className={styles.btnContainer}>
+              <Input
+                icon="chain"
+                iconPosition="right"
+                placeholder="Price"
+                size="medium"
+                value={price}
+                onChange={(e) => {
+                  setPrice(e.target.value);
+                }}
+              />
+              <Button content="판매등록 " size="medium" onClick={saleNft} />
+            </div>
           </div>
         </div>
       </div>

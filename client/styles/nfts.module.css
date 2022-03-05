@@ -79,5 +79,16 @@
     font-weight: 300;
 }
 .btnContainer{
-    margin-top: 50px;
+    width: 35vh;
+     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    /* flex-direction: column; */
+}
+.buyContainer{
+
+    width: 15vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

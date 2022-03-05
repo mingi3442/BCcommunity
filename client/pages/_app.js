@@ -12,7 +12,9 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     if (userInfo.username !== undefined) {
-      setIsLogin(!isLogin);
+      setIsLogin(true);
+    } else {
+      setIsLogin(false);
     }
   }, [userInfo]);
   return (

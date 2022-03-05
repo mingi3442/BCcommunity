@@ -23,7 +23,7 @@ export default function board() {
             return (
               <>
                 <Link href={`/post/${post._id}`}>
-                  <Item>
+                  <Item style={{ cursor: "pointer" }} key={post._id}>
                     <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
                     <Item.Content>
                       <Item.Header>{post.title}</Item.Header>

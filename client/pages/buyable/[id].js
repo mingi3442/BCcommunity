@@ -6,7 +6,7 @@ import styles from "../../styles/nfts.module.css";
 
 const Post = ({ userInfo }) => {
   const [token, setToken] = useState([]);
-
+  console.log(token);
   const router = useRouter();
   const { id } = router.query;
   console.log(id);
@@ -22,13 +22,24 @@ const Post = ({ userInfo }) => {
 
   const buynft = () => {
     axios
-      .post("http://localhost:8000/nft", {
+      .post("http://localhost:8000/buynft", {
+        buyerId: userInfo._id,
+        buyerUserName: userInfo.username,
         price: token.price,
         buyer: userInfo.address,
         buyerPk: userInfo.privateKey,
+        ownerAddress: token.ownerAddress,
+        ownerName: token.ownerName,
+        ownerId: token.ownerId,
+        tokenId: id,
       })
       .then((res) => {
-        setToken(res.data[0]);
+        console.log("구매 완료!");
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log(error);
+        return error;
       });
   };
 
@@ -63,24 +74,26 @@ const Post = ({ userInfo }) => {
           <div className={styles.contentContainer}>
             <p className={styles.contentFont}>NFT ID</p>
             <p className={styles.contentValue}>{token._id}</p>
-            <br />
+
             <p className={styles.contentFont}>NFT Owner</p>
             <p className={styles.contentValue}>{token.ownerName}</p>
-            <br />
-            <p className={styles.contentFont}>NFT Price</p>
-            <p className={styles.contentValue}>
-              <Icon name="chain" />
-              {token.price}
-            </p>
-            {token.buyable == "1" ? (
-              <>
-                <p className={styles.contentFont}>Token Price</p>
-                <p className={styles.contentValue}>
-                  <Icon name="chain" size="mini" />
-                  {token.price}
-                </p>
-                <Button primary content="Buy!" />
-              </>
+
+            {token.buyable == "ok" ? (
+              <div>
+                <p className={styles.contentFont}>NFT Price</p>
+                <div className={styles.buyContainer}>
+                  <div className={styles.contentFont}>
+                    <Icon name="chain" />
+                    {token.price}
+                  </div>
+                  <Button animated="vertical" onClick={buynft}>
+                    <Button.Content hidden>구매하기</Button.Content>
+                    <Button.Content visible>
+                      <Icon name="shop" />
+                    </Button.Content>
+                  </Button>
+                </div>
+              </div>
             ) : (
               ""
             )}

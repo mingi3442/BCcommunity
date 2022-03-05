@@ -2,13 +2,13 @@ import styles from "../styles/main.module.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Button, Card, Container, Divider, Grid, Header, Icon, Image, Item, Label } from "semantic-ui-react";
-import Login from "../src/components/login";
 import Link from "next/link";
 import Nft from "../src/components/Nft";
 
 export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
   const [posts, setPosts] = useState([]);
   const [nfts, setNfts] = useState([]);
+  console.log(isLogin);
   useEffect(() => {
     axios.get("http://localhost:8000/explore").then((res) => {
       setNfts(res.data.slice(0, 3));
@@ -20,7 +20,6 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
     }
     axios.get("http://localhost:8000/getdata").then((res) => {
       console.log(res.data);
-      console.log(userInfo);
     });
   }, []);
   useEffect(() => {
@@ -41,59 +40,10 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
         console.log(err);
       });
   };
-  // const onClick = () => {
-  //   // console.log(userInfo);
-  //   axios
-  //     .post("http://localhost:8000/create", {
-  //       userId: userInfo._id,
-  //       username: userInfo.username,
-  //       address: userInfo.address,
-  //       privateKey: userInfo.privateKey,
-  //       imgUri: "https://media.vlpt.us/images/moment_log/post/1705d3c4-afe6-41d2-a301-6a3aff9bd7cb/smartContract.jpeg?w=768",
-  //       erc20: userInfo.erc20,
-  //       // reciptUser: "server",
-  //       title: "WOW",
-  //       desc: "LOL!!",
-  //       // reciptAddress: "0x616aE0a72ce2396F551F944b923e1C8108c8BFC3",
-  //       value: 30,
-  //     })
-  //     .then((res) => {
-  //       console.log(res);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-  // // const onClick = () => {
-  // //   axios.get("http://localhost:8000/getdata").then((res) => {
-  // //     console.log(res.data);
-  // //   });
-  // // };
-  // const ethFaucet = () => {
-  //   axios
-  //     .post("http://localhost:8000/ethFaucet", {
-  //       username: userInfo.username,
-  //       address: userInfo.address,
-  //     })
-  //     .then((res) => {
-  //       console.log(res);
-  //     });
-  // };
-  // const logout = () => {
-  //   axios.get("./api/logout").then((res) => {
-  //     if (res.status === 200) {
-  //       console.log("logout!!");
-  //     }
-  //   });
-  //   setIsLogin(false);
-  //   setUserInfo({});
-  // };
+
   return (
-    // <div className={styles.container}>
     <Grid>
       <Grid.Row stretched>
-        {/* <Grid.Column width={7}></Grid.Column> */}
-
         <Grid.Column width={4}>
           <div className={styles.contentContainer}>
             <Card>
@@ -101,11 +51,18 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
               <Card.Content>
                 <Card.Header>
                   {userInfo.username == undefined ? (
-                    <Link href="/login">
-                      <Label as="a">
-                        <Icon name="arrow circle right" /> 로그인하러 가기
-                      </Label>
-                    </Link>
+                    <>
+                      <Link href="/login">
+                        <Label as="a">
+                          <Icon name="arrow circle right" /> 로그인하러 가기
+                        </Label>
+                      </Link>
+                      <Link href="/signup">
+                        <Label as="a">
+                          <Icon name="add user" /> 회원가입하러 가기
+                        </Label>
+                      </Link>
+                    </>
                   ) : (
                     userInfo.username
                   )}
@@ -157,7 +114,7 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
                 return (
                   <>
                     <Link href={`/post/${post._id}`}>
-                      <Item>
+                      <Item style={{ cursor: "pointer" }} key={post._id}>
                         <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
                         <Item.Content>
                           <Item.Header>{post.title}</Item.Header>
@@ -178,6 +135,5 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
         </Grid.Column>
       </Grid.Row>
     </Grid>
-    // </div>
   );
 }

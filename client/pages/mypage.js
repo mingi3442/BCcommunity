@@ -71,9 +71,14 @@ function mypage({ userInfo }) {
                   <span className="date">Joined in 2015</span>{" "}
                 </Card.Meta> */}
                 <br />
-                <Card.Description>{`Eth 보유량 : ${userInfo.eth == undefined ? "0" : userInfo.eth}`}</Card.Description>
+                <Card.Description>
+                  {`Eth 보유량 : ${userInfo.eth == undefined ? "0" : userInfo.eth}`} <Icon name="ethereum" />
+                </Card.Description>
                 <br />
-                <Card.Description>{`BMT 보유량 : ${userInfo.erc20 == undefined ? "0" : userInfo.erc20}`}</Card.Description>
+                <Card.Description>
+                  {`BMT 보유량 : ${userInfo.erc20 == undefined ? "0" : userInfo.erc20}`}
+                  <Icon name="chain" />
+                </Card.Description>
               </Card.Content>
               <Card.Content extra>
                 {" "}
@@ -101,7 +106,7 @@ function mypage({ userInfo }) {
                   return (
                     <div key={post._id}>
                       <Link href={`/post/${post._id}`}>
-                        <Item key={post._id}>
+                        <Item style={{ cursor: "pointer" }} key={post._id}>
                           <Item.Image size="tiny" src={post.img === "" ? `/noImage.png` : `${post.img}`} />
                           <Item.Content>
                             <Item.Header>{post.title}</Item.Header>

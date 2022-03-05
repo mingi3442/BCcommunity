@@ -35,8 +35,8 @@ export default function Login({ setUserInfo, userInfo }) {
       });
   };
   return (
-    <Grid textAlign="center" verticalAlign="middle">
-      <Grid.Column>
+    <Grid textAlign="center" style={{ height: "100vh" }} verticalAlign="middle">
+      <Grid.Column style={{ maxWidth: 450 }}>
         <Header as="h2" color="grey" textAlign="center">
           <Image src="/logo.png" /> Blockmunity 로그인
         </Header>

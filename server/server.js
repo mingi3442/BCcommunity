@@ -44,6 +44,7 @@ const serveToken = async (receiptAccount, value) => {
 
   // const nonce = await web3.eth.getTransactionCount(sender, "latest");
   // console.log(nonce);
+
   const txData = contract.methods.transfer(receiptAccount, value).encodeABI();
   const rawTransaction = {
     to: process.env.ERC20ADDR,
@@ -55,7 +56,6 @@ const serveToken = async (receiptAccount, value) => {
     .then(async (signedTx) => {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, req) => {
         if (!err) {
-          console.log("AA");
           await contract.methods
             .balanceOf(receiptAccount)
             .call()
@@ -86,13 +86,10 @@ MongoClient.connect(process.env.MONGODB_URL, function (err, client) {
 });
 app.post("/login", passport.authenticate("local", { failureMessage: true }), function (req, res) {
   user = req.session.passport.user;
-  console.log(user.address);
   serveToken(user.address, 30);
-  // console.log( a);
   res.send({ massage: "ok", user: user });
 });
 app.post("/reload", (req, res) => {
-  console.log(req.body);
   const username = req.body.username;
   db.collection("users").findOne({ username: username }, (err, result) => {
     res.send({ result });
@@ -130,12 +127,6 @@ passport.deserializeUser(function (username, done) {
   done(null, {});
 });
 
-app.get("/getdata", async (req, res) => {
-  const web3 = new Web3("HTTP://127.0.0.1:7545");
-  const accounts = await web3.eth.getAccounts();
-  // console.log(accounts);
-  return res.send("Responding from server!");
-});
 app.get("/getdata", async (req, res) => {
   const web3 = new Web3("HTTP://127.0.0.1:7545");
   const accounts = await web3.eth.getAccounts();
@@ -188,7 +179,6 @@ app.post("/sendtoken", async (req, res) => {
   });
 });
 app.post("/create", async (req, res) => {
-  console.log(req.body);
   Contract.setProvider("HTTP://127.0.0.1:7545");
   const server = process.env.TOKEN_ADDRESS;
   const serverPK = process.env.TOKEN_PRIVATEKEY;
@@ -243,18 +233,19 @@ app.post("/create", async (req, res) => {
                       title: title,
                       desc: desc,
                       img: imgUri,
-                      buyable: "0",
+                      buyable: "No",
                       price: 0,
+                      prevOwnerName: "",
+                      prevOwnerId: "",
                       createAt: timestamp(),
                     };
                     db.collection("nfts").insertOne(token, (err, result) => {
                       console.log(err);
-                      console.log("insert:", result);
+
                       db.collection("nftCounter").updateOne({ name: "lastNftId" }, { $inc: { nftId: 1 } }, (err, result) => {
                         if (err) {
                           console.log(err);
                         } else {
-                          console.log("생성 완료!");
                           res.json({ message: "생성 완료!" });
                         }
                       });
@@ -317,12 +308,10 @@ app.get("/getposts", (req, res) => {
   db.collection("posts")
     .find({})
     .toArray(function (err, result) {
-      console.log(result);
       res.send(result);
     });
 });
 app.post("/getpost", (req, res) => {
-  console.log("postid?", typeof req.body.postId);
   db.collection("posts").findOne({ _id: parseInt(req.body.postId) }, (err, result) => {
     res.send(result);
   });
@@ -354,10 +343,17 @@ app.post(
 app.get(
   "/explore",
   (req, res) => {
+    let nfts = [];
     db.collection("nfts")
       .find({ ownerName: "ss" })
       .toArray((err, result) => {
-        res.send(result);
+        result.map((e) => nfts.push(e));
+        db.collection("nfts")
+          .find({ buyable: "ok" })
+          .toArray((err, result) => {
+            result.map((e) => nfts.push(e));
+            res.send(result);
+          });
       });
     //
   } //   res.send("OK");
@@ -385,7 +381,6 @@ app.get(
   } //   res.send("OK");
 );
 app.post("/userpage", (req, res) => {
-  // console.log("postid?", typeof req.body.postId);
   db.collection("users").findOne({ username: req.body.username }, (err, result) => {
     res.send(result);
   });
@@ -394,14 +389,12 @@ app.post("/userpage", (req, res) => {
 });
 
 app.post("/write", async (req, res) => {
-  //   console.log(req.user);
   db.collection("postCounter").findOne({ name: "totalPost" }, function (err, result) {
-    console.log(req.body);
     var total = result.total;
     var post = { _id: total + 1, owner: req.body.owner, ownerName: req.body.ownerName, title: req.body.title, desc: req.body.desc, img: req.body.img, createAt: timestamp() };
     db.collection("posts").insertOne(post, function (err, result) {
       console.log(err);
-      console.log("insert:", result);
+
       db.collection("postCounter").updateOne({ name: "totalPost" }, { $inc: { total: 1 } }, function (err, result) {
         if (err) {
           return console.log(err);
@@ -414,7 +407,6 @@ app.post("/write", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body.password, req.body.mnemonic);
   let username = req.body.username;
   let password = req.body.pw;
   let mnemonic;
@@ -454,13 +446,13 @@ app.post("/signup", async (req, res) => {
         });
       }
     );
-  } catch (exception) {
-    console.log("NewWallet ==>>>> " + exception);
+  } catch (err) {
+    console.log(err);
   }
 });
 app.delete("/delete", (req, res) => {
   postId = parseInt(req.body.postId);
-  console.log(typeof postId);
+
   db.collection("posts").deleteOne({ _id: postId }, function (err, result) {
     console.log("삭제완료");
   });
@@ -470,7 +462,7 @@ app.post("/sendnft", (req, res) => {
   //sendnft
   const server = process.env.TOKEN_ADDRESS;
   const serverPK = process.env.TOKEN_PRIVATEKEY;
-  console.log(req.body);
+  const ownerPK = req.body.ownerPK;
   const ownerAddress = req.body.ownerAddress;
   const reciptUserName = req.body.reciptUserName;
   const tokenId = req.body.tokenId;
@@ -479,66 +471,49 @@ app.post("/sendnft", (req, res) => {
       console.log("전송하는 유저찾기 실패");
     } else {
       console.log("result1:", result);
-      const ownerPK = result.privateKey;
+      // const ownerPK = result.privateKey;
       var erc721contractABI = erc721Abi;
       var erc721contract = new Contract(erc721contractABI, process.env.ERC721ADDR);
-      const nftData = erc721contract.methods.approve(server, parseInt(tokenId)).encodeABI();
-      const rawTransaction = {
-        from: ownerAddress,
-        to: process.env.ERC721ADDR,
-        gas: 5000000,
-        data: nftData,
-      };
-      web3.eth.accounts.signTransaction(rawTransaction, ownerPK).then((signTx) => {
-        web3.eth.sendSignedTransaction(signTx.rawTransaction, async (err, req) => {
-          if (err) {
-            console.log(err);
-            console.log("approve에러");
-          } else {
-            db.collection("users").findOne({ username: reciptUserName }, (err, result) => {
-              console.log("result2:", result);
+      db.collection("users").findOne({ username: reciptUserName }, (err, result) => {
+        if (err) {
+          console.log("수신유저 찾기 실패");
+        } else {
+          const reciptAddress = result.address;
+          // const reciptUserName = result.username;
+          const reciptId = result._id;
+          console.log(reciptAddress);
+          const nftData = erc721contract.methods.transferFrom(ownerAddress, reciptAddress, parseInt(tokenId)).encodeABI();
+          const rawTransaction = {
+            from: server,
+            to: process.env.ERC721ADDR,
+            gas: 5000000,
+            data: nftData,
+          };
+          web3.eth.accounts.signTransaction(rawTransaction, ownerPK).then((signTx) => {
+            web3.eth.sendSignedTransaction(signTx.rawTransaction, async (err, req) => {
               if (err) {
-                console.log("수신유저 찾기 실패");
+                console.log("transferFrom에러: ", err);
               } else {
-                const reciptAddress = result.address;
-                console.log(reciptAddress);
-                const nftData = erc721contract.methods.transferFrom(server, reciptAddress, tokenId).encodeABI();
-                const rawTransaction = {
-                  from: server,
-                  to: process.env.ERC721ADDR,
-                  gas: 5000000,
-                  data: nftData,
-                };
-                web3.eth.accounts.signTransaction(rawTransaction, serverPK).then((signTx) => {
-                  web3.eth.sendSignedTransaction(signTx.rawTransaction, async (err, req) => {
+                db.collection("nfts").updateOne(
+                  { _id: parseInt(tokenId) },
+                  { $set: { ownerId: reciptId, ownerName: reciptUserName, ownerAddress: reciptAddress } },
+                  (err, result) => {
                     if (err) {
-                      console.log("전송실패 ? ");
-                      console.log(err);
+                      console.log("db수정 실패?");
                     } else {
-                      db.collection("nfts").updateOne(
-                        { _id: tokenId },
-                        { $set: { ownerId: result._id, ownerName: result.username, ownerAddress: result.address } },
-                        (err, result) => {
-                          if (err) {
-                            console.log("db수정 실패?");
-                          } else {
-                            console.log("전송 완료!");
-                            res.json({ message: "전송 완료!" });
-                          }
-                        }
-                      );
+                      console.log("전송 완료!");
+                      res.json({ message: "전송 완료!" });
                     }
-                  });
-                });
+                  }
+                );
               }
             });
-          }
-        });
+          });
+        }
       });
     }
   });
-
-  return res.send("Responding from server!");
+  // return res.send("Responding from server!");
 });
 
 app.post("/buynft", async (req, res) => {
@@ -546,21 +521,20 @@ app.post("/buynft", async (req, res) => {
   Contract.setProvider("HTTP://127.0.0.1:7545");
   var erc20contractABI = erc20Abi;
   var erc721contractABI = erc721Abi;
+  const server = process.env.TOKEN_ADDRESS;
+  const serverPK = process.env.TOKEN_PRIVATEKEY;
   var erc20contract = await new Contract(erc20contractABI, process.env.ERC20ADDR);
   var erc721contract = await new Contract(erc721contractABI, process.env.ERC721ADDR);
   const buyerAddress = req.body.buyer;
   const price = req.body.price;
   const buyerPk = req.body.buyerPk;
-  // const imgUri = req.body.imgUri;
-  // const createrAddress = req.body.address;
-  // const createrPK = req.body.privateKey;
-  // const ownerId = req.body.userId;
-  // const ownerName = req.body.username;
-  // const title = req.body.title;
-  // const desc = req.body.desc;
-  // const reciptAddress = req.body.reciptAddress;
-  // const nonce = await web3.eth.getTransactionCount(server, "latest");
-  const txData = erc20contract.methods.transfer(server, 200).encodeABI();
+  const ownerAddress = req.body.ownerAddress;
+  const buyerUserName = req.body.buyerUserName;
+  const ownerName = req.body.ownerName;
+  const buyerId = req.body.buyerId;
+  const tokenId = req.body.tokenId;
+  const ownerId = req.body.ownerId;
+  const txData = erc20contract.methods.transfer(ownerAddress, 200).encodeABI();
   const rawTransaction = {
     from: buyerAddress,
     to: process.env.ERC20ADDR,
@@ -569,13 +543,15 @@ app.post("/buynft", async (req, res) => {
   };
   web3.eth.accounts.signTransaction(rawTransaction, buyerPk).then(async (signTx) => {
     web3.eth.sendSignedTransaction(signTx.rawTransaction, async (err, req) => {
-      if (!err) {
-        db.collection("users").updateOne({ address: buyerAddress }, { $inc: { erc20: -200 } }, (err, result) => {
+      if (err) {
+        console.log("erc20 transfer 에러 : ", err);
+      } else {
+        db.collection("users").updateOne({ address: buyerAddress }, { $inc: { erc20: -parseInt(price) } }, (err, result) => {
           console.log("토큰 사용 완료");
           if (err) {
             console.log("토큰 감소 오류;;;");
           } else {
-            const nftData = erc721contract.methods.mintNFT(createrAddress, imgUri).encodeABI();
+            const nftData = erc721contract.methods.transferFrom(ownerAddress, buyerAddress, parseInt(tokenId)).encodeABI();
             const rawTransaction = {
               from: server,
               to: process.env.ERC721ADDR,
@@ -585,41 +561,70 @@ app.post("/buynft", async (req, res) => {
             web3.eth.accounts.signTransaction(rawTransaction, serverPK).then((signTx) => {
               web3.eth.sendSignedTransaction(signTx.rawTransaction, async (err, req) => {
                 if (err) {
-                  console.log("민팅 실패?;;;");
+                  console.log("transferFrom에러: ", err);
                 } else {
-                  db.collection("nftCounter").findOne({ name: "lastNftId" }, (err, result) => {
-                    var nftId = result.nftId;
-                    var token = {
-                      _id: nftId,
-                      ownerId: ownerId,
-                      ownerName: ownerName,
-                      ownerAddress: createrAddress,
-                      title: title,
-                      desc: desc,
-                      img: imgUri,
-                      createAt: timestamp(),
-                    };
-                    db.collection("nfts").insertOne(token, (err, result) => {
-                      console.log(err);
-                      console.log("insert:", result);
-                      db.collection("nftCounter").updateOne({ name: "lastNftId" }, { $inc: { nftId: 1 } }, (err, result) => {
-                        if (err) {
-                          console.log(err);
-                        } else {
-                          console.log("생성 완료!");
-                          res.json({ message: "생성 완료!" });
-                        }
-                      });
-                    });
-                  });
+                  db.collection("nfts").updateOne(
+                    { _id: parseInt(tokenId) },
+                    {
+                      $set: {
+                        ownerId: buyerId,
+                        ownerName: buyerUserName,
+                        ownerAddress: buyerAddress,
+                        buyable: "no",
+                        prevOwnerName: ownerName,
+                        prevOwnerId: ownerId,
+                        prevPrice: price,
+                        price: 0,
+                      },
+                    },
+                    (err, result) => {
+                      if (err) {
+                        console.log("db수정 실패?");
+                      } else {
+                        console.log("구매완료!!!");
+                        res.json({ message: "구매완료!!!" });
+                      }
+                    }
+                  );
                 }
               });
             });
           }
         });
+      }
+    });
+  });
+});
+
+app.post("/saleNft", async (req, res) => {
+  const server = process.env.TOKEN_ADDRESS;
+  const serverPK = process.env.TOKEN_PRIVATEKEY;
+  const tokenId = req.body.tokenId;
+  const ownerAddress = req.body.ownerAddress;
+  const ownerPK = req.body.ownerPK;
+  const price = req.body.price;
+  var erc721contractABI = erc721Abi;
+  var erc721contract = new Contract(erc721contractABI, process.env.ERC721ADDR);
+  const nftData = erc721contract.methods.approve(server, parseInt(tokenId)).encodeABI();
+  const rawTransaction = {
+    from: server,
+    to: process.env.ERC721ADDR,
+    gas: 5000000,
+    data: nftData,
+  };
+  web3.eth.accounts.signTransaction(rawTransaction, ownerPK).then((signTx) => {
+    web3.eth.sendSignedTransaction(signTx.rawTransaction, async (err, req) => {
+      if (err) {
+        console.log("apporve err :", err);
       } else {
-        console.log(err);
-        res.json({ message: "토큰 부족" });
+        db.collection("nfts").updateOne({ _id: parseInt(tokenId) }, { $set: { price: price, buyable: "ok" } }, (err, result) => {
+          if (err) {
+            console.log("db수정 에러 : ", err);
+          } else {
+            console.log("판매 등록 완료!!");
+            res.json({ message: "판매 등록 완료!!" });
+          }
+        });
       }
     });
   });
