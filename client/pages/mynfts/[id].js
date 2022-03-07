@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styles from "../../styles/nfts.module.css";
-import { Button, Divider, Icon, Input, Label } from "semantic-ui-react";
+import { Button, Divider, Icon, Input, Label, Message } from "semantic-ui-react";
 import axios from "axios";
 
 const Post = ({ userInfo }) => {
@@ -115,6 +115,17 @@ const Post = ({ userInfo }) => {
               />
               <Button content="판매등록 " size="medium" onClick={saleNft} />
             </div>
+            {token.prevOwnerId ? (
+              <Message floating>
+                <Message.Header>Prev Data</Message.Header>
+                <span>👤 PrevOwnerName : {token.prevOwnerName} </span>
+                <span>
+                  <br />✓ PrevPrice : {token.prevPrice} <Icon name="chain" size="mini" />
+                </span>
+              </Message>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
   console.log(isLogin);
   useEffect(() => {
     axios.get("http://localhost:8000/explore").then((res) => {
-      setNfts(res.data.slice(0, 3));
+      setNfts(res.data.reverse().slice(0, 3));
     });
   }, []);
   useEffect(() => {
@@ -100,14 +100,16 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
       <Grid.Row>
         <Grid.Column width={12}>
           <div style={{ marginLeft: "15px" }} className={styles.contentFont}>
-            판매중인 NFT
+            <Link href="/exchange">판매중인 NFT</Link>
           </div>
           <Divider />
           <Nft nftList={nfts} isMine={false} />
         </Grid.Column>
         <Grid.Column width={4}>
           <div className={styles.boardContainer}>
-            <div className={styles.contentFont}>게시판 최신 글</div>
+            <div className={styles.contentFont}>
+              <Link href="/board">게시판 최신 글</Link>
+            </div>
             <Divider />
             <Item.Group>
               {posts.map((post) => {
@@ -120,7 +122,6 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
                           <Item.Header>{post.title}</Item.Header>
                           <Item.Meta>
                             <span>{post.ownerName}</span>
-                            {/* <span className="stay">1 Month</span> */}
                           </Item.Meta>
                           <Item.Description>{post.createAt}</Item.Description>
                         </Item.Content>

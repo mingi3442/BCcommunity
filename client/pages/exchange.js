@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Button, Divider, Form, Icon, Input, Label } from "semantic-ui-react";
 import Nft from "../src/components/Nft";
@@ -9,9 +10,10 @@ export default function exchange({ setUserInfo, userInfo }) {
   const [sendUser, setSendUser] = useState("");
   const [sendError, setSendError] = useState(false);
   const [nfts, setNfts] = useState([]);
+  const router = useRouter();
   useEffect(() => {
     axios.get("http://localhost:8000/explore").then((res) => {
-      setNfts(res.data);
+      setNfts(res.data.reverse());
     });
   }, []);
   const ethFaucet = () => {
@@ -23,7 +25,6 @@ export default function exchange({ setUserInfo, userInfo }) {
       .then((res) => {
         setUserInfo({ ...userInfo, eth: res.data.balance });
         refresh();
-        // console.log(res.balance);
       });
   };
   const sendToken = () => {
@@ -38,6 +39,7 @@ export default function exchange({ setUserInfo, userInfo }) {
       })
       .then((res) => {
         console.log(res);
+        router.push("/");
       });
   };
   const refresh = () => {

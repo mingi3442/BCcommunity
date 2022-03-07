@@ -24,9 +24,8 @@ function Nft({ nftList, isMine }) {
                 </div>
                 <div style={{ marginRight: "20px" }}>
                   {/* <Icon name="info circle" size="large" /> */}
-                  <p className={styles.grayFont}>
-                    <Icon name="chain" size="mini" />
-                    {token.price}
+                  <p className={styles.amoutFont}>
+                    {token.price == 0 ? "" : token.price} <Icon name="chain" size="small" />
                   </p>
                 </div>
               </div>

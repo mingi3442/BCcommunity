@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Button, Divider, Icon } from "semantic-ui-react";
+import { Button, Divider, Icon, Message } from "semantic-ui-react";
 import styles from "../../styles/nfts.module.css";
 
 const Post = ({ userInfo }) => {
@@ -94,6 +94,17 @@ const Post = ({ userInfo }) => {
                   </Button>
                 </div>
               </div>
+            ) : (
+              ""
+            )}
+            {token.prevOwnerId ? (
+              <Message floating>
+                <Message.Header>Prev Data</Message.Header>
+                <span>👤 PrevOwnerName : {token.prevOwnerName} </span>
+                <span>
+                  <br />✓ PrevPrice : {token.prevPrice} <Icon name="chain" size="mini" />
+                </span>
+              </Message>
             ) : (
               ""
             )}
