@@ -16,54 +16,71 @@ ERC20토큰을 통한 인센티브 기반 커뮤니티이며 토큰은 서로 �
 
 ### Prerequisites
 
-> **_실행전 수정해야 하는 부분_**
+> **_실행전 필요한 것_**
 
 ```
-/client/pages/_app.js
-
-function MyApp({ Component, pageProps }) {
-  ...
-  const [newErc721addr, setNewErc721Addr] = useState("자신이 발행한 이더리움 컨트랙트 주소");
-  const [newKip17addr, setNewKip17Addr] = useState("자신이 발행한 클레이튼 컨트랙트 주소");
-  ...
-}
+**ERC721, ERC20 Contract, Ganache**
 ```
 
 > **_설치된 modules_**
+
+#### Client
 
 ```
 npm i semantic-ui-react semantic-ui-css
 ```
 
 ```
-npm i caver-js
+npm i axios
 ```
 
 ```
-npm i web3
+npm i express
 ```
 
 ```
 npm i ipfs-http-client
 ```
 
-```
-npm i assert
-```
-
-### Installation
+#### Server
 
 ```
-cd client/
+npm i body-parser
 ```
 
 ```
-npm install
+npm i cors
+```
+
+```
+npm i dotenv
+```
+
+```
+npm i eth-lightwallet
+```
+
+```
+npm i express express-session
+```
+
+```
+npm i mongodb
+```
+
+```
+npm i passport passport-local
+```
+
+```
+npm i web3
 ```
 
 ### Run Start
 
 ---
+
+#### Client
 
 ```
 cd client/
@@ -73,6 +90,16 @@ cd client/
 npm run dev
 ```
 
-## Built With
+#### Server
+
+```
+cd server/
+```
+
+```
+nodemon server.js
+```
+
+## Built
 
 - [이민기](https://github.com/mingi3442)
