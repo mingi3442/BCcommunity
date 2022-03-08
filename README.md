@@ -102,4 +102,4 @@ nodemon server.js
 
 ## Built
 
-- [이민기](https://github.com/mingi3442)
+<!-- - [이민기](https://github.com/mingi3442) -->
