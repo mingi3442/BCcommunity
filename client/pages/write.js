@@ -35,9 +35,13 @@ export default function write({ userInfo }) {
   };
   const onChange = async (e) => {
     const file = e.target.files[0];
+    console.log(e.target.files);
+    console.log(file);
+
     setImage(URL.createObjectURL(file));
     try {
       const added = await client.add(file);
+      console.log(URL.createObjectURL(file));
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
       updateFileUrl(url);
     } catch (error) {

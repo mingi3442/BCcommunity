@@ -9,37 +9,37 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
   const [posts, setPosts] = useState([]);
   const [nfts, setNfts] = useState([]);
   console.log(isLogin);
-  useEffect(() => {
-    axios.get("http://localhost:8000/explore").then((res) => {
-      setNfts(res.data.reverse().slice(0, 3));
-    });
-  }, []);
-  useEffect(() => {
-    if (isLogin) {
-      refresh();
-    }
-    axios.get("http://localhost:8000/getdata").then((res) => {
-      console.log(res.data);
-    });
-  }, []);
-  useEffect(() => {
-    axios.get("http://localhost:8000/getposts").then((res) => {
-      console.log(res.data);
-      setPosts(res.data.reverse().slice(0, 5));
-    });
-  }, []);
-  const refresh = () => {
-    axios
-      .post("http://localhost:8000/reload", {
-        username: userInfo.username,
-      })
-      .then((res) => {
-        setUserInfo(res.data.result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // useEffect(() => {
+  //   axios.get("http://localhost:8000/explore").then((res) => {
+  //     setNfts(res.data.reverse().slice(0, 3));
+  //   });
+  // }, []);
+  // useEffect(() => {
+  //   if (isLogin) {
+  //     refresh();
+  //   }
+  //   axios.get("http://localhost:8000/getdata").then((res) => {
+  //     console.log(res.data);
+  //   });
+  // }, []);
+  // useEffect(() => {
+  //   axios.get("http://localhost:8000/getposts").then((res) => {
+  //     console.log(res.data);
+  //     setPosts(res.data.reverse().slice(0, 5));
+  //   });
+  // }, []);
+  // const refresh = () => {
+  //   axios
+  //     .post("http://localhost:8000/reload", {
+  //       username: userInfo.username,
+  //     })
+  //     .then((res) => {
+  //       setUserInfo(res.data.result);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   return (
     <Grid>
