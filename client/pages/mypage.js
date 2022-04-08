@@ -11,34 +11,22 @@ function mypage({ userInfo }) {
   const [myPosts, setMyPosts] = useState([]);
   const [myNfts, setMyNfts] = useState([]);
   const router = useRouter();
-  console.log(0.5 > parseFloat(user.eth));
+  console.log(userInfo);
   useEffect(() => {
-    axios.get("api/islogin").then((res) => {
+    axios.get("api/islogin").then(async (res) => {
       if (res.status === 200 && res.data.name) {
         //로그인
-        axios
-          .post("http://localhost:8000/userpage", {
-            username: userInfo.username,
-          })
-          .then((res) => {
-            setUser(res.data);
-          });
-        axios
-          .post("http://localhost:8000/getmyposts", {
-            username: userInfo.username,
-          })
-          .then((res) => {
-            console.log(res.data);
-            setMyPosts(res.data);
-          });
-        axios
-          .post("http://localhost:8000/getmynfts", {
-            username: userInfo.username,
-          })
-          .then((res) => {
-            console.log(res.data);
-            setMyNfts(res.data);
-          });
+        await axios.get(`http://localhost:8000/user/${userInfo._id}`).then((res) => {
+          setUser(res.data);
+        });
+        await axios.get(`http://localhost:8000/user/${userInfo._id}/post`).then((res) => {
+          console.log("post: ", res.data);
+          setMyPosts(res.data.posts.slice(0, 5));
+        });
+        await axios.get(`http://localhost:8000/user/${userInfo._id}/nft`).then((res) => {
+          console.log("nft : ", res.data);
+          setMyNfts(res.data.nfts);
+        });
       } else {
         //로그인x
         router.push("/login");
@@ -112,7 +100,6 @@ function mypage({ userInfo }) {
                             <Item.Header>{post.title}</Item.Header>
                             <Item.Meta>
                               <span>{post.ownerName}</span>
-                              {/* <span className="stay">1 Month</span> */}
                             </Item.Meta>
                             <Item.Description>{post.createAt}</Item.Description>
                           </Item.Content>

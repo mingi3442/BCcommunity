@@ -7,22 +7,29 @@ import { Button, Form, Grid, Header, Image, Message, Segment } from "semantic-ui
 
 export default function SignUp() {
   const router = useRouter();
+  const [userId, setUserId] = useState("");
   const [username, setUsername] = useState("");
-  const [pw, setPw] = useState("");
+  const [password, setPassword] = useState("");
   const [result, setResult] = useState(0);
   // console.log(title, date);
   const onClick = async () => {
     await axios
-      .post("http://localhost:8000/signup", {
-        username: username,
-        pw: pw,
+      .post("http://localhost:8000/user/signup", {
+        username,
+        userId,
+        password,
       })
       .then((res) => {
+        console.log(res);
+        console.log(data);
         if (res.data.message === "OK") {
           setResult(1);
         } else {
           setResult(2);
         }
+      })
+      .catch((err) => {
+        if (err.response) console.log(err.response.data);
       });
   };
   return (
@@ -40,6 +47,16 @@ export default function SignUp() {
               name="username"
               placeholder="User ID"
               onChange={(e) => {
+                setUserId(e.target.value);
+              }}
+            />
+            <Form.Input
+              fluid
+              icon="user circle"
+              iconPosition="left"
+              name="username"
+              placeholder="username"
+              onChange={(e) => {
                 setUsername(e.target.value);
               }}
             />
@@ -51,7 +68,7 @@ export default function SignUp() {
               placeholder="Password"
               type="password"
               onChange={(e) => {
-                setPw(e.target.value);
+                setPassword(e.target.value);
               }}
             />
 

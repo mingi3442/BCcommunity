@@ -11,27 +11,15 @@ const Post = ({ userInfo }) => {
   const { id } = router.query;
   console.log(id);
   useEffect(() => {
-    axios
-      .post("http://localhost:8000/nft", {
-        tokenId: id,
-      })
-      .then((res) => {
-        setToken(res.data[0]);
-      });
+    axios.get(`http://localhost:8000/nft/${id}`).then((res) => {
+      setToken(res.data.nft);
+    });
   }, [id]);
 
   const buynft = () => {
     axios
-      .post("http://localhost:8000/buynft", {
-        buyerId: userInfo._id,
-        buyerUserName: userInfo.username,
-        price: token.price,
-        buyer: userInfo.address,
-        buyerPk: userInfo.privateKey,
-        ownerAddress: token.ownerAddress,
-        ownerName: token.ownerName,
-        ownerId: token.ownerId,
-        tokenId: id,
+      .post(`http://localhost:8000/nft/${id}/buy`, {
+        userId: userInfo._id,
       })
       .then((res) => {
         console.log("구매 완료!");
@@ -78,7 +66,7 @@ const Post = ({ userInfo }) => {
             <p className={styles.contentFont}>NFT Owner</p>
             <p className={styles.contentValue}>{token.ownerName}</p>
 
-            {token.buyable == "ok" ? (
+            {token.buyable ? (
               <div>
                 <p className={styles.contentFont}>NFT Price</p>
                 <div className={styles.buyContainer}>
@@ -97,7 +85,7 @@ const Post = ({ userInfo }) => {
             ) : (
               ""
             )}
-            {token.prevOwnerId ? (
+            {token.prevOwner ? (
               <Message floating>
                 <Message.Header>Prev Data</Message.Header>
                 <span>👤 PrevOwnerName : {token.prevOwnerName} </span>

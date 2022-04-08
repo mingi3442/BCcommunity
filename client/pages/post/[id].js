@@ -7,7 +7,7 @@ import styles from "../../styles/id.module.css";
 
 const Post = ({ userInfo }) => {
   const [post, setPost] = useState({});
-  const [replys, setReplys] = useState([]);
+  const [comments, setComments] = useState([]);
   const [reply, setReply] = useState("");
   const router = useRouter();
   const { id } = router.query;
@@ -17,11 +17,10 @@ const Post = ({ userInfo }) => {
   }, []);
   const getPost = () => {
     axios
-      .post("http://localhost:8000/getpost", {
-        postId: id,
-      })
+      .get(`http://localhost:8000/post/${id}`)
       .then((res) => {
-        setPost(res.data);
+        console.log(res.data.postData);
+        setPost(res.data.postData);
       })
       .catch((err) => {
         console.log(err);
@@ -30,11 +29,10 @@ const Post = ({ userInfo }) => {
 
   const getReply = () => {
     axios
-      .post("http://localhost:8000/getreply", {
-        postId: id,
-      })
+      .get(`http://localhost:8000/post/${id}/comment`)
       .then((res) => {
-        setReplys(res.data);
+        console.log(res.data.comments);
+        setComments(res.data.comments);
       })
       .catch((err) => {
         console.log(err);
@@ -151,19 +149,20 @@ const Post = ({ userInfo }) => {
                   </Comment>
                 </Comment.Group>
               </Comment>
-              {replys.length == 0
+              {comments.length == 0
                 ? ""
-                : replys.map((e) => {
+                : comments.map((e) => {
                     return (
                       <>
                         <Comment>
                           <Comment.Avatar src="/avatar_basic.png" />
                           <Comment.Content>
-                            <Comment.Author as="a">{e.ownerName}</Comment.Author>
+                            <Comment.Author as="a">{e.username}</Comment.Author>
                             <Comment.Metadata>
                               <div>{e.createAt}</div>
                             </Comment.Metadata>
                             <Comment.Text>{e.desc}</Comment.Text>
+                            <Comment.Text>{e.createdAt}</Comment.Text>
 
                             <Comment.Actions>
                               <div onClick={deleteReply}>

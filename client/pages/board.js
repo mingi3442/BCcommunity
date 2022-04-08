@@ -8,9 +8,9 @@ import Link from "next/link";
 export default function board() {
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    axios.get("http://localhost:8000/getposts").then((res) => {
-      console.log(res.data);
-      setPosts(res.data.reverse());
+    axios.get("http://localhost:8000/post/").then((res) => {
+      console.log(res.data.posts);
+      setPosts(res.data.posts);
     });
   }, []);
   return (

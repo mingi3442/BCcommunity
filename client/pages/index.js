@@ -9,25 +9,26 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
   const [posts, setPosts] = useState([]);
   const [nfts, setNfts] = useState([]);
   console.log(isLogin);
-  // useEffect(() => {
-  //   axios.get("http://localhost:8000/explore").then((res) => {
-  //     setNfts(res.data.reverse().slice(0, 3));
-  //   });
-  // }, []);
+  useEffect(() => {
+    axios.get("http://localhost:8000/nft/explore").then((res) => {
+      // console.log(res);
+      setNfts(res.data.nft.slice(0, 3));
+    });
+  }, []);
   // useEffect(() => {
   //   if (isLogin) {
   //     refresh();
   //   }
-  //   axios.get("http://localhost:8000/getdata").then((res) => {
+  //   axios.get("http://localhost:8000/user").then((res) => {
   //     console.log(res.data);
   //   });
   // }, []);
-  // useEffect(() => {
-  //   axios.get("http://localhost:8000/getposts").then((res) => {
-  //     console.log(res.data);
-  //     setPosts(res.data.reverse().slice(0, 5));
-  //   });
-  // }, []);
+  useEffect(() => {
+    axios.get("http://localhost:8000/post/").then((res) => {
+      // console.log(res.data.posts);
+      setPosts(res.data.posts.reverse().slice(0, 5));
+    });
+  }, []);
   // const refresh = () => {
   //   axios
   //     .post("http://localhost:8000/reload", {

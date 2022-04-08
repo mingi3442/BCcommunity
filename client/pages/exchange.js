@@ -12,29 +12,25 @@ export default function exchange({ setUserInfo, userInfo }) {
   const [nfts, setNfts] = useState([]);
   const router = useRouter();
   useEffect(() => {
-    axios.get("http://localhost:8000/explore").then((res) => {
-      setNfts(res.data.reverse());
+    axios.get("http://localhost:8000/nft/explore").then((res) => {
+      setNfts(res.data.nft);
     });
   }, []);
   const ethFaucet = () => {
     axios
-      .post("http://localhost:8000/ethFaucet", {
-        username: userInfo.username,
-        address: userInfo.address,
+      .post("http://localhost:8000/user/eth", {
+        userId: userInfo._id,
       })
       .then((res) => {
-        setUserInfo({ ...userInfo, eth: res.data.balance });
+        // console.log(res.data.user);
+        // setUserInfo({ ...res.data.user });
         refresh();
       });
   };
   const sendToken = () => {
     axios
-      .post("http://localhost:8000/sendtoken", {
-        username: userInfo.username,
-        address: userInfo.address,
-        privateKey: userInfo.privateKey,
-        reciptUser: sendUser,
-        // reciptAddress: "0x616aE0a72ce2396F551F944b923e1C8108c8BFC3",
+      .post(`http://localhost:8000/token/${sendUser}`, {
+        userId: userInfo._id,
         value: sendErc,
       })
       .then((res) => {
@@ -44,11 +40,9 @@ export default function exchange({ setUserInfo, userInfo }) {
   };
   const refresh = () => {
     axios
-      .post("http://localhost:8000/reload", {
-        username: userInfo.username,
-      })
+      .get(`http://localhost:8000/user/${userInfo._id}`)
       .then((res) => {
-        setUserInfo(res.data.result);
+        setUserInfo(res.data.user);
       })
       .catch((err) => {
         console.log(err);

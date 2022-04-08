@@ -8,17 +8,18 @@ import Login from "../src/components/login";
 
 export default function login({ setUserInfo, userInfo }) {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [pw, setPw] = useState("");
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
   const onClick = async () => {
     // e.preventDefault();
     await axios
-      .post("http://localhost:8000/login", {
-        username: username,
-        pw: pw,
+      .post("http://localhost:8000/user/login", {
+        userId,
+        password,
       })
       .then((res) => {
         setUserInfo(res.data.user);
+        console.log(res.data);
         axios.post("./api/login").then((res) => {
           if (res.status === 200) {
             //로그인 성공
@@ -31,7 +32,7 @@ export default function login({ setUserInfo, userInfo }) {
       })
       .catch((err) => {
         if (err) {
-          console.log("aa");
+          console.log(err);
         }
       });
   };
@@ -50,7 +51,7 @@ export default function login({ setUserInfo, userInfo }) {
               name="username"
               placeholder="User ID"
               onChange={(e) => {
-                setUsername(e.target.value);
+                setUserId(e.target.value);
               }}
             />
             <Form.Input
@@ -61,7 +62,7 @@ export default function login({ setUserInfo, userInfo }) {
               placeholder="Password"
               type="password"
               onChange={(e) => {
-                setPw(e.target.value);
+                setPassword(e.target.value);
               }}
             />
 

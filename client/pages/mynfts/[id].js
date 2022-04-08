@@ -13,22 +13,17 @@ const Post = ({ userInfo }) => {
   const { id } = router.query;
   console.log(to);
   console.log(token);
-  useEffect(async () => {
-    axios
-      .post("http://localhost:8000/nft", {
-        tokenId: id,
-      })
-      .then((res) => {
-        setToken(res.data[0]);
-      });
+  useEffect(() => {
+    axios.get(`http://localhost:8000/nft/${id}`).then((res) => {
+      setToken(res.data.nft);
+    });
   }, [id]);
   const sendNft = () => {
     axios
-      .post("http://localhost:8000/sendnft", {
-        ownerAddress: userInfo.address,
-        ownerPK: userInfo.privateKey,
+      .post(`http://localhost:8000/nft/${id}/send`, {
+        userId: userInfo._id,
         tokenId: id,
-        reciptUserName: to,
+        otherUserName: to,
       })
       .then((res) => {
         console.log("전송 완료!");
@@ -41,10 +36,8 @@ const Post = ({ userInfo }) => {
   };
   const saleNft = () => {
     axios
-      .post("http://localhost:8000/saleNft", {
+      .post(`http://localhost:8000/nft/${id}/register`, {
         tokenId: id,
-        ownerAddress: userInfo.address,
-        ownerPK: userInfo.privateKey,
         price: price,
       })
       .then((res) => {

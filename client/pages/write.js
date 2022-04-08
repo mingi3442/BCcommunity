@@ -51,10 +51,8 @@ export default function write({ userInfo }) {
   const createPost = async () => {
     // console.log(userInfo._id);
     await axios
-      .post("http://localhost:8000/write", {
-        ownerAddress: userInfo.address,
-        ownerName: userInfo.username,
-        owner: userInfo._id,
+      .post("http://localhost:8000/post/", {
+        userId: userInfo._id,
         title: title,
         desc: desc,
         img: fileUrl,
@@ -65,7 +63,7 @@ export default function write({ userInfo }) {
       })
       .catch((err) => {
         if (err) {
-          console.log("aa");
+          console.log(err.respnese.data);
         }
       });
   };

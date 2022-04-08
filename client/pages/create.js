@@ -32,23 +32,19 @@ export default function createNFT({ userInfo }) {
     }
   };
   const createNft = () => {
-    // console.log(userInfo);
+    // console.log(fileUrl);
     axios
-      .post("http://localhost:8000/create", {
+      .post("http://localhost:8000/nft", {
         userId: userInfo._id,
-        username: userInfo.username,
-        address: userInfo.address,
-        privateKey: userInfo.privateKey,
-        imgUri: fileUrl,
-        erc20: userInfo.erc20,
+        img: fileUrl,
         title: nftName,
         desc: nftDesc,
       })
       .then((res) => {
-        router.push("/");
+        // router.push("/");
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.respnse.data);
       });
   };
   return (
