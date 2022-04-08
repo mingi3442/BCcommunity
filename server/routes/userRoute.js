@@ -3,40 +3,17 @@ const userRouter = Router();
 const mongoose = require("mongoose");
 const { isValidObjectId } = require("mongoose");
 const lightwallet = require("eth-lightwallet");
-const { User, Post } = require("../src/models");
-const Web3 = require("web3");
-const web3 = new Web3("HTTP://127.0.0.1:7545");
-var Contract = require("web3-eth-contract");
-const erc20Abi = require("../erc20Abi");
+const { User, Post, Nft } = require("../src/models");
+const { getEth } = require("../libs/eth");
 
 require("dotenv").config();
 
 userRouter.get("/eth", async (req, res) => {
   const { userId } = req.body;
-  console.log(userId);
   try {
     if (!isValidObjectId(userId)) return res.status(400).send({ err: "userId is invalid" });
     const { address } = await User.findById(userId);
-    const sendAccount = process.env.GANACHE_ADDRESS;
-    const privateKey = process.env.GANACHE_PRIVATEKEY;
-    const tx = {
-      from: sendAccount,
-      to: address,
-      gas: 500000,
-      value: web3.utils.toWei("0.1", "ether"),
-    };
-    await web3.eth.accounts.signTransaction(tx, privateKey).then((signedTx) => {
-      web3.eth.sendSignedTransaction(signedTx.rawTransaction, async (err, hash) => {
-        if (err) {
-          console.log("transaction 실패 : ", err);
-        } else {
-          const balance = await web3.eth.getBalance(address);
-          console.log(typeof parseFloat(web3.utils.fromWei(balance, "ether")));
-          const user = await User.updateOne({ _id: userId }, { eth: parseFloat(web3.utils.fromWei(balance, "ether")) });
-          res.status(200).json({ user });
-        }
-      });
-    });
+    getEth(address, userId);
   } catch (err) {
     console.log(err);
   }
@@ -106,8 +83,18 @@ userRouter.get("/:userId/post", async (req, res) => {
   try {
     if (!isValidObjectId(userId)) return res.status(400).send({ err: "invalid userId" });
     const posts = await Post.find({ userId: userId });
-    console.log(posts);
     return res.status(200).send({ posts });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+userRouter.get("/:userId/nft", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    if (!isValidObjectId(userId)) return res.status(400).send({ err: "invalid userId" });
+    const nfts = await Nft.find({ ownerId: userId });
+    return res.status(200).send({ nfts });
   } catch (err) {
     console.log(err);
   }

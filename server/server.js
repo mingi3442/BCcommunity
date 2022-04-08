@@ -3,13 +3,13 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
-const lightwallet = require("eth-lightwallet");
 const passport = require("passport");
+const Web3 = require("web3");
+const lightwallet = require("eth-lightwallet");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 const erc20Abi = require("./erc20Abi");
 const erc721Abi = require("./erc721Abi");
-const Web3 = require("web3");
 const bcrypt = require("bcrypt");
 const erc20byteCode = require("./erc20ByteCode");
 const erc721byteCode = require("./erc721ByteCode");
@@ -19,7 +19,7 @@ const erc721Addr = process.env.ERC721ADDR;
 // const server = process.env.TOKEN_ADDRESS;
 // const serverPK = process.env.TOKEN_PRIVATEKEY;
 var Contract = require("web3-eth-contract");
-const { userRouter, postRouter, tokenRouter } = require("./routes");
+const { userRouter, postRouter, tokenRouter, nftRouter } = require("./routes");
 
 require("dotenv").config();
 
@@ -640,6 +640,7 @@ const server = () => {
     app.use("/user/", userRouter);
     app.use("/post/", postRouter);
     app.use("/token/", tokenRouter);
+    app.use("/nft/", nftRouter);
 
     app.listen(8000, async () => {
       console.log(`server listening on port 8000`);
