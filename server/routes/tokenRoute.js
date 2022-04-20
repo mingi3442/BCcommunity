@@ -19,14 +19,15 @@ tokenRouter.get("/", async (req, res) => {
   }
 });
 
-tokenRouter.post("/:otherUserId", async (req, res) => {
-  const { otherUserId } = req.params;
+tokenRouter.post("/:otherUsername", async (req, res) => {
+  const { otherUsername } = req.params;
   const { userId, value } = req.body;
-  console.log(value);
+  console.log(otherUsername);
   try {
     if (!isValidObjectId(userId)) return res.status(400).send({ err: "userId is invalid" });
-    if (!isValidObjectId(otherUserId)) return res.status(400).send({ err: "otherUserId is invalid" });
-    if (sendToken(userId, otherUserId, value)) return res.status(200).send({ msg: "sendToken Success!!" });
+    const { _id } = await User.findOne({ username: otherUsername });
+
+    if (sendToken(userId, _id, value)) return res.status(200).send({ msg: "sendToken Success!!" });
     res.status(400).send({ msg: "sendToken Fail.." });
   } catch (err) {
     console.log(err);

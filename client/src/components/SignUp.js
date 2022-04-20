@@ -5,13 +5,26 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { Button, Form, Grid, Header, Image, Message, Segment } from "semantic-ui-react";
 
+// interface IInput {
+//   userId?: string;
+//   username?: string;
+//   password?: string;
+// }
+// interface IResult {
+//   result: number;
+// }
+
 export default function SignUp() {
   const router = useRouter();
+  // const [userId, setUserId] = useState<IInput>();
+  // const [username, setUsername] = useState<IInput>();
+  // const [password, setPassword] = useState<IInput>();
+  // const [result, setResult] = useState<IResult>();
   const [userId, setUserId] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [result, setResult] = useState(0);
-  // console.log(title, date);
+
   const onClick = async () => {
     await axios
       .post("http://localhost:8000/user/signup", {
@@ -21,7 +34,6 @@ export default function SignUp() {
       })
       .then((res) => {
         console.log(res);
-        console.log(data);
         if (res.data.message === "OK") {
           setResult(1);
         } else {

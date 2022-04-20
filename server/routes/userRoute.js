@@ -8,12 +8,13 @@ const { getEth } = require("../libs/eth");
 
 require("dotenv").config();
 
-userRouter.get("/eth", async (req, res) => {
+userRouter.post("/eth", async (req, res) => {
   const { userId } = req.body;
   try {
     if (!isValidObjectId(userId)) return res.status(400).send({ err: "userId is invalid" });
     const { address } = await User.findById(userId);
-    getEth(address, userId);
+    const user = getEth(address, userId);
+    return res.status(200).send({ user });
   } catch (err) {
     console.log(err);
   }
@@ -21,15 +22,18 @@ userRouter.get("/eth", async (req, res) => {
 
 userRouter.post("/signup", async (req, res) => {
   let { username, password, userId } = req.body;
+  console.log(username, password, userId);
   if (!userId) return res.status(400).send({ err: "userID is required!" });
   if (!username) return res.status(400).send({ err: "username is required!" });
   if (!password) return res.status(400).send({ err: "password is required!" });
   let mnemonic, address, pk;
 
   try {
-    const userIdCheck = await User.exists({ userId: userId });
-    const usernameCheck = await User.exists({ username: username });
-    if (userIdCheck || usernameCheck) return res.status(400).send({ err: "이미 존재하는 아이디 혹은 username 입니다." });
+    // const userIdCheck = await User.exists({ userID: userId });
+    // const usernameCheck = await User.exists({ username: username });
+    // console.log(userIdCheck);
+    // if (!userIdCheck || !usernameCheck) return res.status(400).send({ err: "이미 존재하는 아이디 혹은 username 입니다." });
+
     mnemonic = lightwallet.keystore.generateRandomSeed();
     lightwallet.keystore.createVault(
       {
@@ -42,9 +46,9 @@ userRouter.post("/signup", async (req, res) => {
           ks.generateNewAddress(pwDerivedKey);
           address = ks.getAddresses().toString();
           pk = ks.exportPrivateKey(address, pwDerivedKey);
-          const user = new User({ userId, username, password, address: address.toString(), privateKey: pk, mnemonic, erc20: 0, eth: 0 });
+          const user = new User({ userID: userId, username, password, address: address.toString(), privateKey: pk, mnemonic, erc20: 0, eth: 0 });
           user.save();
-          return res.send({ user });
+          return res.send({ user, message: "OK" });
         });
       }
     );
@@ -56,11 +60,11 @@ userRouter.post("/signup", async (req, res) => {
 userRouter.post("/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
-    const userIdCheck = await User.exists({ userId: userId });
+    const userIdCheck = await User.exists({ userID: userId });
     if (!userIdCheck) return res.status(400).send({ err: "userId is not exists." });
-    const user = await User.findOne({ userId: userId, password: password });
+    const user = await User.findOne({ userID: userId, password: password });
     if (!user) return res.status(400).send({ err: " Password is wrong." });
-    if (user) return res.status(200).send({ msg: "Sucess Login" });
+    if (user) return res.status(200).send({ user, msg: "Sucess Login" });
   } catch (err) {
     console.log(err);
   }
@@ -69,7 +73,7 @@ userRouter.post("/login", async (req, res) => {
 userRouter.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log(userId);
+    // console.log(userId);
     if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ err: "invalid userId" });
     const user = await User.findById({ _id: userId });
     res.send({ user });

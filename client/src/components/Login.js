@@ -17,6 +17,7 @@ export default function Login({ setUserInfo, userInfo }) {
         pw: pw,
       })
       .then((res) => {
+        console.log(res.data.user);
         setUserInfo(res.data.user);
         axios.post("./api/login").then((res) => {
           if (res.status === 200) {

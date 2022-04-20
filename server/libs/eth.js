@@ -23,7 +23,7 @@ module.exports = {
           } else {
             const balance = await web3.eth.getBalance(address);
             const user = await User.updateOne({ _id: userId }, { eth: parseFloat(web3.utils.fromWei(balance, "ether")) });
-            return true;
+            return user;
           }
         });
       });

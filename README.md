@@ -10,6 +10,8 @@
 
 ---
 
+ERC20 토큰과 ERC721를 이용하지만 유저들이 암호화폐 지갑의 존재를 인지하지 않도록 하여 더욱 유저 친화적인 자유로운 이야기를 위한 커뮤니티 사이트
+
 ERC20토큰을 통한 인센티브 기반 커뮤니티이며 토큰은 서로 주고받거나 NFT를 만든데에도 사용된다
 
 ## Get Started
@@ -22,59 +24,9 @@ ERC20토큰을 통한 인센티브 기반 커뮤니티이며 토큰은 서로 �
 **ERC721, ERC20 Contract, Ganache**
 ```
 
-> **_설치된 modules_**
+> **_실행 화면 _**
 
-#### Client
-
-```
-npm i semantic-ui-react semantic-ui-css
-```
-
-```
-npm i axios
-```
-
-```
-npm i express
-```
-
-```
-npm i ipfs-http-client
-```
-
-#### Server
-
-```
-npm i body-parser
-```
-
-```
-npm i cors
-```
-
-```
-npm i dotenv
-```
-
-```
-npm i eth-lightwallet
-```
-
-```
-npm i express express-session
-```
-
-```
-npm i mongodb
-```
-
-```
-npm i passport passport-local
-```
-
-```
-npm i web3
-```
+실행 화면 및 코드작성과정은 [블로그]("https://velog.io/@moment_log/Blockmunity-0")에 작성되어 있습니다.
 
 ### Run Start
 
@@ -102,4 +54,4 @@ nodemon server.js
 
 ## Built
 
-<!-- - [이민기](https://github.com/mingi3442) -->
+- [이민기](https://github.com/mingi3442)

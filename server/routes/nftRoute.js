@@ -10,8 +10,8 @@ const { mintNFT, sendNFT } = require("../libs/erc721");
 const { sendToken } = require("../libs/erc20");
 
 nftRouter.get("/explore", async (req, res) => {
-  const nft = await Nft.find({ buyable: true }).exec();
-  console.log(nft);
+  const nft = await Nft.find({ buyable: true });
+  // console.log(nft);
   return res.status(200).send({ nft });
 });
 
@@ -52,12 +52,12 @@ nftRouter.post("/:nftId/cancel", async (req, res) => {
 });
 nftRouter.post("/:nftId/send", async (req, res) => {
   const { nftId } = req.params;
-  const { userId, otherUserId } = req.body;
+  const { userId, otherUserName } = req.body;
   if (!isValidObjectId(nftId)) return res.status(400).send({ err: "nftId is invalid" });
   if (!isValidObjectId(userId)) return res.status(400).send({ err: "userId is invalid" });
-  if (!isValidObjectId(otherUserId)) return res.status(400).send({ err: "otherUserId is invalid" });
+  const { _id } = User.findOne({ username: otherUserName });
   const { privateKey, address } = await User.findById(userId);
-  const otherUser = await User.findById(otherUserId);
+  const otherUser = await User.findById(_id);
   const { nftTokenId } = await Nft.findById(nftId);
 
   const nft = await sendNFT(privateKey, address, nftTokenId, nftId, otherUser.address, otherUserId, userId);

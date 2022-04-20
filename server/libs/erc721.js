@@ -43,7 +43,7 @@ module.exports = {
                 console.log("민팅 실패?;;;");
               } else {
                 const allToken = await erc721contract.methods.totalSupply().call();
-                const nft = await new Nft({ ownerId: owner_id, nftId: allToken, title, desc, img: imgUri, ownerName });
+                const nft = await new Nft({ ownerId: owner_id, nftTokenId: allToken, title, desc, img: imgUri, ownerName });
                 nft.save();
                 return true;
               }

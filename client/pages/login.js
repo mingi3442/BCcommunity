@@ -7,6 +7,7 @@ import { Button, Form, Grid, Header, Image, Message, Segment } from "semantic-ui
 import Login from "../src/components/login";
 
 export default function login({ setUserInfo, userInfo }) {
+  // export default function login() {
   const router = useRouter();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -18,8 +19,8 @@ export default function login({ setUserInfo, userInfo }) {
         password,
       })
       .then((res) => {
+        console.log(res.status);
         setUserInfo(res.data.user);
-        console.log(res.data);
         axios.post("./api/login").then((res) => {
           if (res.status === 200) {
             //로그인 성공

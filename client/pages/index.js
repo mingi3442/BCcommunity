@@ -15,32 +15,13 @@ export default function Home({ isLogin, userInfo, setIsLogin, setUserInfo }) {
       setNfts(res.data.nft.slice(0, 3));
     });
   }, []);
-  // useEffect(() => {
-  //   if (isLogin) {
-  //     refresh();
-  //   }
-  //   axios.get("http://localhost:8000/user").then((res) => {
-  //     console.log(res.data);
-  //   });
-  // }, []);
+
   useEffect(() => {
     axios.get("http://localhost:8000/post/").then((res) => {
       // console.log(res.data.posts);
       setPosts(res.data.posts.reverse().slice(0, 5));
     });
   }, []);
-  // const refresh = () => {
-  //   axios
-  //     .post("http://localhost:8000/reload", {
-  //       username: userInfo.username,
-  //     })
-  //     .then((res) => {
-  //       setUserInfo(res.data.result);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
 
   return (
     <Grid>
