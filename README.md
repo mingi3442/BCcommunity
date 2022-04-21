@@ -24,11 +24,11 @@ ERC20토큰을 통한 인센티브 기반 커뮤니티이며 토큰은 서로 �
 
 ### Prerequisites
 
-- **_실행전 필요한 것_**
+- **실행전 필요한 것**
 
 > **ERC721, ERC20 Contract, Ganache**
 
-- **_실행 화면_**
+- **실행 화면**
 
 > 실행 화면 및 코드작성과정은 [블로그](https://velog.io/@moment_log/Blockmunity-0)에 작성되어 있습니다.
 
